@@ -45,10 +45,21 @@ public class BaseStateMachine extends BaseAutonomous {
         TEAM,
     }
 
+    public enum Color {
+        RED,
+        BLUE,
+    }
+
+    public enum Side {
+        LEFT,
+        RIGHT,
+    }
+
     private final static String TAG = "BaseStateMachine";// Logging tag
     private State mCurrentState;                         // Current State Machine State.
     private ElapsedTime mStateTime = new ElapsedTime();  // Time into current state
-
+    private Color chosenColor;
+    private Side chosenSide;
     /** Initializes State Machine
      */
     public void init() {
@@ -72,6 +83,24 @@ public class BaseStateMachine extends BaseAutonomous {
         telemetry.update();
 
         identifySleeve();
+        if (gamepad1.start){
+            if (gamepad1.left_bumper) {
+                chosenColor = Color.BLUE;
+                chosenSide = Side.LEFT;
+            }
+            if (gamepad1.b) {
+                chosenColor = Color.BLUE;
+                chosenSide = Side.RIGHT;
+            }
+            if (gamepad1.y) {
+                chosenColor = Color.RED;
+                chosenSide = Side.RIGHT;
+            }
+            if (gamepad1.x) {
+                chosenColor = Color.RED;
+                chosenSide = Side.LEFT;
+            }
+        }
     }
 
     private void identifySleeve() {
