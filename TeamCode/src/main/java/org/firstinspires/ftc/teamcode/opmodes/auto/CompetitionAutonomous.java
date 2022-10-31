@@ -11,7 +11,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
 
     public static final int POLE_WIDTH = 45;
     public static final int CONE_WIDTH = 150;
-
+    public static int sign = -1; // sign variable for now
     // List of all states the robot could be in
     private enum State {
         IDENTIFY_TARGET,
@@ -57,7 +57,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
                 if (teamAsset == null) {
                     //drive forward slowly/10 inches and identify again
                     //backwards is forwards
-                    if (driveSystem.driveToPosition(100, DriveSystem.Direction.BACKWARD, 0.2)) {
+                    if (driveSystem.driveToPosition(100, DriveSystem.Direction.FORWARD, 0.2)) {
                         currentPos += 100;
                         teamAsset = Sleeve.BRIAN;
                     }
@@ -98,7 +98,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
                 }
                 break;
 
-            case PARK:
+            case PARK: zc v
                 if (park()) {
                     newState(State.END_STATE);
                 }
@@ -113,14 +113,14 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
 
     private boolean park() {
         if (step == 0) {
-            if (driveSystem.driveToPosition(440-currentPos, DriveSystem.Direction.BACKWARD, 0.3)) {
+            if (driveSystem.driveToPosition(440-currentPos, DriveSystem.Direction.FORWARD, 0.3)) {
                 step++;
             }
         }
         if (step == 1) {
             if (teamAsset == Sleeve.BRIAN ||
-                    (teamAsset == Sleeve.TEAM && driveSystem.driveToPosition(500, DriveSystem.Direction.LEFT, 0.3)) ||
-                    (teamAsset == Sleeve.DAVID && driveSystem.driveToPosition(500, DriveSystem.Direction.RIGHT, 0.3))) {
+                    (teamAsset == Sleeve.TEAM && driveSystem.driveToPosition(500, DriveSystem.Direction.RIGHT, 0.3)) ||
+                    (teamAsset == Sleeve.DAVID && driveSystem.driveToPosition(500, DriveSystem.Direction.LEFT, 0.3))) {
                 return true;
             }
         }
@@ -131,12 +131,12 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
         switch (startPosition) {
             case START:
                 if (step == 0) {
-                    if (driveSystem.driveToPosition(950 - currentPos, DriveSystem.Direction.BACKWARD, 0.4)) {
+                    if (driveSystem.driveToPosition(950 - currentPos, DriveSystem.Direction.FORWARD, 0.4)) {
                         step++;
                     }
                 }
                 if (step == 1) {
-                    if (driveSystem.turn(-45, 0.2)) {
+                    if (driveSystem.turn(sign * -45, 0.2)) {
                         return true;
                     }
                 }
@@ -150,17 +150,17 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
 
     private void reverseJunction() {
         if(step == 0){
-            if (driveSystem.driveToPosition(40, DriveSystem.Direction.FORWARD, 0.4)){
+            if (driveSystem.driveToPosition(40, DriveSystem.Direction.BACKWARD, 0.4)){
                 step++;
             }
         }
         if (step == 1) {
-            if (driveSystem.turn(45, 0.2)) {
+            if (driveSystem.turn(sign * 45, 0.2)) {
                 step++;
             }
         }
         if (step == 2) {
-            if (driveSystem.driveToPosition(450, DriveSystem.Direction.FORWARD, 0.4)) {
+            if (driveSystem.driveToPosition(450, DriveSystem.Direction.BACKWARD, 0.4)) {
                 newState(State.PARK);
             }
         }
@@ -172,14 +172,14 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
 
         // Back up
         if(step == 0){
-            if(driveSystem.driveToPosition(60, DriveSystem.Direction.FORWARD, 0.3)){
+            if(driveSystem.driveToPosition(60, DriveSystem.Direction.BACKWARD, 0.3)){
                 step++;
             }
         }
 
         // Rotate
         if(step == 1){
-            if(driveSystem.turn(135, 0.5)){
+            if(driveSystem.turn(sign * 135, 0.5)){
                 step++;
             }
 
@@ -187,7 +187,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
 
         // Drive to cone
         if(step == 2) {
-            if (driveSystem.driveToPosition(360, DriveSystem.Direction.BACKWARD, 0.5)) {
+            if (driveSystem.driveToPosition(360, DriveSystem.Direction.FORWARD, 0.5)) {
                 return true;
             }
         }
