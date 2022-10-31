@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.base;
 
+import android.util.Log;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -18,7 +20,7 @@ public abstract class BaseOpMode extends OpMode {
     protected DriveSystem driveSystem;
     protected PixyCam pixycam;
     protected int step = 0;
-
+    private static final String TAG = "BaseOpMode";
 
     @Override
     public void init(){
@@ -55,12 +57,17 @@ public abstract class BaseOpMode extends OpMode {
     }
 
     protected boolean alignDistance(int desiredWidth){
+        Log.d(TAG, "desiredWidth: " + desiredWidth);
         int distanceOffset = pixycam.distanceOffset(desiredWidth);// find actual desired width
-        if (distanceOffset > 10) {
-            driveSystem.driveToPosition(100, DriveSystem.Direction.BACKWARD, 0.3);
-        } else if (distanceOffset < -10) {
-            driveSystem.driveToPosition(100, DriveSystem.Direction.FORWARD, 0.3);
+        Log.d(TAG, "distanceOffset: " + distanceOffset);
+        if (distanceOffset > 50) {
+            Log.d(TAG, "driving backward");
+           driveSystem.drive(0,0, 0.3f); // drive BACKWARD
+        } else if (distanceOffset < -50) {
+            Log.d(TAG, "driving forward");
+            driveSystem.drive(0,0, -0.3f); // drive FORWARD
         } else {
+            Log.d(TAG, "stopping");
             driveSystem.setMotorPower(0);
             return true;
         }
