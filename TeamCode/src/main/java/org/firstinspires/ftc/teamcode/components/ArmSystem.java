@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.components;
 import android.util.Log;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -71,10 +72,23 @@ public class ArmSystem {
     }
 
     public void toDaGround(){
+
         armRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         armLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        armRight.setPower(0);
-        armLeft.setPower(0);
+
+        DcMotorEx armLeftEx = (DcMotorEx) armLeft;
+        DcMotorEx armRightEx = (DcMotorEx) armRight;
+
+
+        //slow death
+        if (driveToLevel(ArmSystem.FLOOR, 0.2)) {
+            armLeftEx.setVelocity(50);
+            armRightEx.setVelocity(50);
+            if (driveToLevel(ArmSystem.LOW, 0.8)) {
+                armRight.setPower(0);
+                armLeft.setPower(0);
+            }
+        }
     }
 
 
