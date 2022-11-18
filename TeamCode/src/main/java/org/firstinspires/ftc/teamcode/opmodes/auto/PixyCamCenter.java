@@ -44,7 +44,10 @@ public class PixyCamCenter extends BaseOpMode {
         return this.stopRequested || Thread.currentThread().isInterrupted();
     }
     public void loop(){
-        block = pixycam.GetBiggestBlock(PixyCam.BLUE);
+        block = pixycam.getBiggestBlock(PixyCam.BLUE);
+        if (block == null) {
+            return;
+        }
         Log.d("block ", block.toString());
         String s = block.width + " " + block.height;
         String coords = block.x + ", " + block.y;

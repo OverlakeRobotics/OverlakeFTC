@@ -64,7 +64,8 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
         time = new ElapsedTime();
         sign = teamSide == TeamSide.LEFT ? -1: 1;
         startPosition = From.START;
-        newState(State.IDENTIFY_TARGET);
+        newState(State.ALIGN_WITH_POLE);
+        pixycam.reset();
     }
 
     /**
@@ -103,7 +104,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
                 break;
             case ALIGN_WITH_POLE:
                 if (align(PixyCam.YELLOW, POLE_WIDTH)) {
-                    newState(State.PLACE_CONE);
+                    newState(State.END_STATE);
                 }
 //                if ((time.seconds() - nowTime) >= 2) {
 //                    newState(State.REVERSE_JUNCTION);
@@ -222,7 +223,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
             boolean drive = driveSystem.turnAbsolute(turn, 0.4);
             boolean arm = revertArm(0.5);
             if (drive && arm) {
-                step = 0;
+                armSystem.killMotors();
                 return true;
             }
         }
@@ -288,10 +289,10 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
     @Override
     public void stop() {
         // Maybe?
-        armSystem.armRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        armSystem.armLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        while(!revertArm(0.3)){
+        if (armSystem.isBusy()) {
+            while (!revertArm(0.3)) {
 
+            }
         }
     }
 }
