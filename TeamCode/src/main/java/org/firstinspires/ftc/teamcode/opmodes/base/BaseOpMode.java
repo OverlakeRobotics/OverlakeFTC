@@ -138,7 +138,7 @@ public abstract class BaseOpMode extends OpMode {
     }
 
     public boolean revertArm(double pow){
-        if(armSystem.driveToLevel(ArmSystem.FLOOR,pow)){
+        if(armSystem.driveToLevel(ArmSystem.FLOOR, pow)){
             armSystem.armLeft.setPower(0);
             armSystem.armRight.setPower(0);
             return true;

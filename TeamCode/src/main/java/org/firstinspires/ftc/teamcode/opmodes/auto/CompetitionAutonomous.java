@@ -15,6 +15,8 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
     public static final int POLE_WIDTH = 40;;
     public static final int CONE_WIDTH = 100;
     private boolean park = false;
+    private boolean drive = false;
+    private boolean arm = false;
     public static final String TAG = "BaseCompetitionAutonomous";
 
     // List of all states the robot could be in
@@ -219,20 +221,24 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
 //            }
 //        }
         if (step == 1) {
-            boolean drive = driveSystem.turnAbsolute(turn, 0.4);
-            boolean arm = revertArm(0.5);
-            if (drive && arm) {
-                step = 0;
-                return true;
+
+            if(driveSystem.turnAbsolute(turn, 0.4)){
+                drive = true;
             }
+            if(armSystem.driveToLevel(ArmSystem.FLOOR, 0.4)){
+                arm = true;
+            }
+            return drive && arm;
+                                                                          
         }
-            return false;
-        }
+        return false;
+
+    }
 
 
         private boolean intake_cone () {
             //TODO make applicable for multiple cones and add ternary
-            if (step == 0 && armSystem.driveToLevel(Cone.FIVE.approach(), .3)) {
+            if (step == 0 && armSystem.driveToLevel(Cone.FIVE.approach(), 0.3)) {
                 step++;
             }
             if (step == 1 &&
