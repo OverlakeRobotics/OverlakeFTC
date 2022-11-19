@@ -2,8 +2,10 @@ package org.firstinspires.ftc.teamcode.opmodes.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.components.ArmSystem;
 import org.firstinspires.ftc.teamcode.components.ArmSystem.Cone;
 import org.firstinspires.ftc.teamcode.components.DriveSystem;
@@ -16,6 +18,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
     public static final int CONE_WIDTH = 100;
     private boolean park = false;
     public static final String TAG = "BaseCompetitionAutonomous";
+
 
     // List of all states the robot could be in
     private enum State {
@@ -110,7 +113,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
 //                }
                 break;
             case PLACE_CONE:
-                if (scoreDaCone(ArmSystem.HIGH)) {
+                if (scoreDaCone(ArmSystem.HIGH, park)) {
                     if(park){
                         newState(State.REVERSE_JUNCTION);
                     }
@@ -155,6 +158,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
                 }
                 break;
             case END_STATE:
+                telemetry.addData("lidar offset", lidar.getDistance(DistanceUnit.MM));
                 //Log.d("parked", teamAsset.toString());
                 //"david" left two squares, "brain" center two, "7330" right two squares
 
@@ -207,23 +211,23 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
                 step++;
             }
         }
-        if(step == 1) {
-            if (revertArm(0.5)) {
-                step += 1;
-            }
-        }
-        if(step == 2){
-            if(driveSystem.turnAbsolute(turn, 0.5)){
-                step = 0;
-                return true; 
-            }
-//        if (step == 1) {
-//            boolean drive = driveSystem.turnAbsolute(turn, 0.5);
-//            boolean arm = revertArm(0.5);
-//            if (drive && arm) {
+//        if(step == 1) {
+//            if (revertArm(0.5)) {
+//                step += 1;
+//            }
+//        }
+//        if(step == 2){
+//            if(driveSystem.turnAbsolute(turn, 0.5)){
 //                step = 0;
 //                return true;
 //            }
+        if (step == 1) {
+            boolean drive = driveSystem.turnAbsolute(turn, 0.5);
+            boolean arm = armSystem.driveToLevel(ArmSystem.FLOOR, 0.4);
+            if (drive && arm) {
+                step = 0;
+                return true;
+            }
         }
         return false;
     }
@@ -235,7 +239,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
             step++;
         }
         if (step == 1 &&
-                driveSystem.driveToPosition(125, DriveSystem.Direction.FORWARD, 0.2)) {
+                driveSystem.driveToPosition(118, DriveSystem.Direction.FORWARD, 0.2)) {
             step++;
         }
         if (step == 2 && (armSystem.intake() || armSystem.driveToLevel(Cone.FIVE.grab(), 0.3))) {

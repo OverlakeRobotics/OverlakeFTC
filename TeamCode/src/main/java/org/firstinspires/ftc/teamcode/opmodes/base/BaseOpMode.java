@@ -8,9 +8,14 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.I2cDevice;
+import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.components.ArmSystem;
 import org.firstinspires.ftc.teamcode.components.DriveSystem;
+import org.firstinspires.ftc.teamcode.components.Lidar;
 import org.firstinspires.ftc.teamcode.components.PixyCam;
 import org.firstinspires.ftc.teamcode.params.DriveParams;
 
@@ -24,13 +29,19 @@ public abstract class BaseOpMode extends OpMode {
     protected DriveSystem driveSystem;
     protected PixyCam pixycam;
     protected ArmSystem armSystem;
+    protected DigitalChannel poleBeam;
+    protected DistanceSensor sonic;
     protected int step = 0;
+    boolean b = false;
     int distanceOffset;
 
 
     @Override
     public void init(){
         setDriveSystem();
+        poleBeam = hardwareMap.get(DigitalChannel.class, "pole beam");
+        poleBeam.setMode(DigitalChannel.Mode.INPUT);
+        sonic = hardwareMap.get(DistanceSensor.class, "dist sensor");
         pixycam = hardwareMap.get(PixyCam.class, "pixy");
         armSystem = new ArmSystem(
                 hardwareMap.get(DcMotor.class, "arm_right"),
@@ -78,7 +89,7 @@ public abstract class BaseOpMode extends OpMode {
             driveSystem.drive(0, 0, -0.3f);
         } else if (distanceOffset < -5) {
             telemetry.addData("driving backwards", 0.3f);
-            driveSystem.drive(0, 0, 1f);
+            driveSystem.drive(0, 0, 0.3f);
         } else {
             telemetry.addData("stopping", 0);
             driveSystem.setMotorPower(0);
@@ -86,6 +97,30 @@ public abstract class BaseOpMode extends OpMode {
         }
         return false;
     }
+
+    protected boolean alignConeDistance(int distance){
+
+        return false;
+    }
+
+    protected boolean beamAlign(boolean cone){
+        driveSystem.drive(0,0,-0.2f);
+        if(!poleBeam.getState()){
+            if(cone){
+                if(driveSystem.driveToPosition(50, DriveSystem.Direction.FORWARD, 0.2)){
+                    driveSystem.setMotorPower(0);
+                    return true;
+                }
+            }
+            else{
+                driveSystem.setMotorPower(0);
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 
     protected boolean align(int colorSignature, int desiredWidth){
         if(step == 0){
@@ -102,7 +137,7 @@ public abstract class BaseOpMode extends OpMode {
         return false;
     }
 
-    public boolean scoreDaCone(int level){
+    public boolean scoreDaCone(int level, boolean park){
         if(step == 0){
             if(armSystem.driveToLevel(level-300, 0.7)){
                 step +=2;
@@ -122,7 +157,7 @@ public abstract class BaseOpMode extends OpMode {
         }
 
         if(step == 3){
-            if(driveSystem.driveToPosition(210, DriveSystem.Direction.FORWARD, 0.2)){
+            if(beamAlign(park)){
                 step++;
             }
             //drive forward

@@ -4,8 +4,12 @@ import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.components.DriveSystem;
+import org.firstinspires.ftc.teamcode.components.Lidar;
 import org.firstinspires.ftc.teamcode.components.PixyCam;
 import org.firstinspires.ftc.teamcode.opmodes.base.BaseOpMode;
 
@@ -15,6 +19,7 @@ public class PixyCamCenter extends BaseOpMode {
     protected PixyCam pixycam;
     private boolean stopRequested;
     private PixyCam.Block block;
+    protected DigitalChannel poleBeam;
     private int count;
     public boolean isTurning;
     public boolean isDriving;
@@ -30,6 +35,8 @@ public class PixyCamCenter extends BaseOpMode {
         count = 0;
         isTurning = false;
         isDriving = false;
+        poleBeam = hardwareMap.get(DigitalChannel.class, "pole beam");
+
 
 
     }

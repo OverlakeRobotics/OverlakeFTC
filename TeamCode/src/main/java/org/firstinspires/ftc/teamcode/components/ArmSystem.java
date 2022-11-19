@@ -183,7 +183,7 @@ public class ArmSystem {
                     elapsedTime.reset();
                     intakeDelay = elapsedTime.milliseconds();
                 }
-                if(elapsedTime.milliseconds() - intakeDelay > 100){
+                if(elapsedTime.milliseconds() - intakeDelay > 500){
                     coneTake.setPower(0.0);
                     state = State.IDLE;
                 }
