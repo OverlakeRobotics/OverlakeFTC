@@ -30,7 +30,6 @@ public abstract class BaseOpMode extends OpMode {
     protected PixyCam pixycam;
     protected ArmSystem armSystem;
     protected DigitalChannel poleBeam;
-    protected DistanceSensor sonic;
     protected int step = 0;
     boolean b = false;
     int distanceOffset;
@@ -41,7 +40,6 @@ public abstract class BaseOpMode extends OpMode {
         setDriveSystem();
         poleBeam = hardwareMap.get(DigitalChannel.class, "pole beam");
         poleBeam.setMode(DigitalChannel.Mode.INPUT);
-        sonic = hardwareMap.get(DistanceSensor.class, "dist sensor");
         pixycam = hardwareMap.get(PixyCam.class, "pixy");
         armSystem = new ArmSystem(
                 hardwareMap.get(DcMotor.class, "arm_right"),
@@ -83,7 +81,7 @@ public abstract class BaseOpMode extends OpMode {
     protected boolean alignDistance(int colorSignature, int desiredWidth){
         distanceOffset = pixycam.distanceOffset(colorSignature, desiredWidth);// find actual desired width
         telemetry.addData("offset", distanceOffset);
-        Log.d("seeing", distanceOffset + " " + pixycam.GetBiggestBlock().width);
+        Log.d("seeing", distanceOffset + " " + pixycam.getBiggestBlock().width);
         if (distanceOffset > 5) {
             telemetry.addData("driving forward", 0);
             driveSystem.drive(0, 0, -0.3f);
@@ -103,11 +101,11 @@ public abstract class BaseOpMode extends OpMode {
         return false;
     }
 
-    protected boolean beamAlign(boolean cone){
+    protected boolean beamAlign(boolean cone, int mm){
         driveSystem.drive(0,0,-0.2f);
         if(!poleBeam.getState()){
             if(cone){
-                if(driveSystem.driveToPosition(50, DriveSystem.Direction.FORWARD, 0.2)){
+                if(driveSystem.driveToPosition(mm, DriveSystem.Direction.FORWARD, 0.2)){
                     driveSystem.setMotorPower(0);
                     return true;
                 }
@@ -139,14 +137,8 @@ public abstract class BaseOpMode extends OpMode {
 
     public boolean scoreDaCone(int level, boolean park){
         if(step == 0){
-            if(armSystem.driveToLevel(level-300, 0.7)){
+            if(armSystem.driveToLevel(level-300, 0.7) && align(PixyCam.YELLOW, POLE_WIDTH)){
                 step +=2;
-            }
-        }
-
-        if(step == 1){
-            if(align(PixyCam.YELLOW, POLE_WIDTH)){
-                step++;
             }
         }
 
@@ -157,18 +149,32 @@ public abstract class BaseOpMode extends OpMode {
         }
 
         if(step == 3){
-            if(beamAlign(park)){
+            if(beamAlign(park, 45)){
                 step++;
             }
             //drive forward
         }
 
         if(step == 4){
+            if(armSystem.driveToLevel(level-20, 0.3)){
+                step++;
+            }
+        }
+
+        if(step == 5){
             if(armSystem.outtake()){
+                step++;
+            }
+        }
+
+        if(step == 6){
+            if(armSystem.driveToLevel(level, 0.3)){
                 step = 0;
                 return true;
             }
         }
+
+
         return false;
     }
 

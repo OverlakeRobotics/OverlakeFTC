@@ -51,15 +51,12 @@ public class PixyCamCenter extends BaseOpMode {
         return this.stopRequested || Thread.currentThread().isInterrupted();
     }
     public void loop(){
-        block = pixycam.getBiggestBlock(PixyCam.BLUE);
-        if (block == null) {
-            return;
-        }
+        block = pixycam.GetBiggestBlock(PixyCam.YELLOW);
         Log.d("block ", block.toString());
         String s = block.width + " " + block.height;
         String coords = block.x + ", " + block.y;
-        int rotationOffset = pixycam.headingOffset(PixyCam.BLUE);
-        int distanceOffset = pixycam.distanceOffset(PixyCam.BLUE, 40);
+        int rotationOffset = pixycam.headingOffset(PixyCam.YELLOW);
+        int distanceOffset = pixycam.distanceOffset(PixyCam.YELLOW, 40);
 //        telemetry.addData("block", s);
 //        telemetry.addData("coords", coords);
         telemetry.addData("distanceOFfset", distanceOffset);

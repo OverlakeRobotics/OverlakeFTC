@@ -239,7 +239,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
             step++;
         }
         if (step == 1 &&
-                driveSystem.driveToPosition(118, DriveSystem.Direction.FORWARD, 0.2)) {
+                beamAlign(true, 5)) {
             step++;
         }
         if (step == 2 && (armSystem.intake() || armSystem.driveToLevel(Cone.FIVE.grab(), 0.3))) {

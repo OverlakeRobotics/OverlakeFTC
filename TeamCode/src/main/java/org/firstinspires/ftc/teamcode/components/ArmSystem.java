@@ -22,7 +22,7 @@ public class ArmSystem {
         TWO (120),
         THREE (150),
         FOUR (190),
-        FIVE (320);
+        FIVE (330);
 
         private final int height;
         // Cone Stack Drop Distance
@@ -187,8 +187,8 @@ public class ArmSystem {
                     elapsedTime.reset();
                     intakeDelay = elapsedTime.milliseconds();
                 }
-                if(elapsedTime.milliseconds() - intakeDelay > 500){
-                    coneTake.setPower(0.0);
+                if(elapsedTime.milliseconds() - intakeDelay > 300){
+                    coneTake.setPower(0.05);
                     state = State.IDLE;
                 }
             } else if (state != State.INTAKING) {
