@@ -79,6 +79,10 @@ public class ArmSystem {
         mTargetPosition = 0;
     }
 
+    public boolean isBusy() {
+        return armLeft.isBusy() || armRight.isBusy();
+    }
+
     public void killMotors() {
         armLeft.setPower(0);
         armRight.setPower(0);
