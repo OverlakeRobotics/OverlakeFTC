@@ -1,3 +1,5 @@
+package org.firstinspires.ftc.teamcode.utilities.scale;
+
 /**
  * Created by EvanCoulson on 9/1/18.
  */
