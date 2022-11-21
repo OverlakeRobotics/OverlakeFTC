@@ -16,9 +16,14 @@ public class CompetitionTeleOp extends BaseOpMode {
      * Drives the motors based on the joystick sticks
      * Left trigger engages slow-drive
      */
+
+
     public void loop() {
+        //right stick x
         float rx = (float) Math.pow(gamepad1.right_stick_x, 3.5);
+        //left stick x
         float lx = (float) Math.pow(gamepad1.left_stick_x, 3);
+        //left stick y
         float ly = (float) Math.pow(gamepad1.left_stick_y, 3);
         driveSystem.slowDrive(gamepad1.left_trigger > 0.3f);
         driveSystem.drive(rx, lx, ly);

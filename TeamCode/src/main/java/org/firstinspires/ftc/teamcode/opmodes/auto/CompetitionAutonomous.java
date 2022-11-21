@@ -58,7 +58,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
         switch (mCurrentState) {
             case IDENTIFY_TARGET:
                 if (teamAsset == null) {
-                    //drive forward slowly/10 inches and identify again
+                    //drive forward slowly/10 cms and identify again
                     //backwards is forwards
                     if (driveSystem.driveToPosition(100, DriveSystem.Direction.BACKWARD, 0.2)) {
                         currentPos += 100;
@@ -66,22 +66,25 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
                     }
                     identifySleeve();
                     telemetry.addData("signal sleeve?: ", vuforia.identifyTeamAsset());
-
                 } else {
+                    // drive to tallest pole
                     newState(State.DRIVE_TO_JUNCTION);
                 }
                 break;
             case DRIVE_TO_JUNCTION:
+                // after finding pole, align with pole
                 if (drive_to_junction()) {
                     newState(State.ALIGN_WITH_POLE);
                 }
                 break;
             case ALIGN_WITH_POLE:
+                // after aligning with pole, place cone
                 if (align(PixyCam.YELLOW, POLE_WIDTH)) {
                     newState(State.PLACE_CONE);
                 }
                 break;
             case PLACE_CONE:
+                // after placing cone, either get another or park
                 if (!park) { // TODO: either get another or park
                     newState(State.DRIVE_TO_CONE);
                 } else {
@@ -89,30 +92,36 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
                 }
                 break;
             case DRIVE_TO_CONE:
+                // after driving to cone, align with cone
                 if (drive_to_cone()) { //dependent on team color
                     newState(State.ALIGN_WITH_CONE);
                 }
                 break;
             case ALIGN_WITH_CONE:
+                // after aligning with cone, intake cone
                 if (align(PixyCam.BLUE, CONE_WIDTH)) {
-                    newState(State.END_STATE);
+                    newState(State.END_STATE); //TODO: should be intake cone instead of end state
                 }
                 break;
             case INTAKE_CONE:
+                // after intaking cone, drive back to pole
                 if (intake_cone()) {
                     newState(State.DRIVE_BACK_TO_POLE);
                 }
                 break;
             case DRIVE_BACK_TO_POLE:
+                // after reaching pole, align with pole
                 if(drive_back_to_pole()){
                     newState(State.ALIGN_WITH_POLE);
                 }
                 break;
             case REVERSE_JUNCTION:
+                // go backwards and prepare to park wooo
                 if(reverseJunction())
                     newState(State.PARK);
                 break;
             case PARK:
+                // park and end state
                 if (park()) {
                     newState(State.END_STATE);
                 }
