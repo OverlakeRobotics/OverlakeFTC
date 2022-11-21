@@ -95,7 +95,9 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
                     telemetry.addData("signal sleeve?: ", vuforia.identifyTeamAsset());
 
                 } else {
-                    newState(State.DRIVE_TO_JUNCTION);
+                    if(armSystem.driveToLevel(ArmSystem.BEACON, 0.6)) {
+                        newState(State.DRIVE_TO_JUNCTION);
+                    }
                 }
                 break;
             case DRIVE_TO_JUNCTION:
@@ -123,7 +125,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
                 }
                 break;
             case DRIVE_TO_CONE:
-                if (driveSystem.driveToPosition(360, DriveSystem.Direction.FORWARD, 0.8)) {
+                if (driveSystem.driveToPosition(360, DriveSystem.Direction.FORWARD, 0.9)) {
                     newState(State.ALIGN_WITH_CONE);
                 }
                 break;
@@ -134,7 +136,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
                 }
                 break;
             case INTAKE_CONE:
-                if (intake_cone()) {
+                if (intake_cone(Cone.FIVE)) {
                     newState(State.DRIVE_BACK_TO_POLE);
                 }
                 break;
@@ -158,7 +160,6 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
                 }
                 break;
             case END_STATE:
-                telemetry.addData("lidar offset", lidar.getDistance(DistanceUnit.MM));
                 //Log.d("parked", teamAsset.toString());
                 //"david" left two squares, "brain" center two, "7330" right two squares
 
@@ -169,8 +170,8 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
     private boolean park() {
         if (step == 0) {
             if (teamAsset == Sleeve.BRIAN ||
-                    (teamAsset == Sleeve.TEAM && driveSystem.driveToPosition(680, DriveSystem.Direction.RIGHT, 0.3)) ||
-                    (teamAsset == Sleeve.DAVID && driveSystem.driveToPosition(680, DriveSystem.Direction.LEFT, 0.3))) {
+                    (teamAsset == Sleeve.TEAM && driveSystem.driveToPosition(680, DriveSystem.Direction.RIGHT, 0.8)) ||
+                    (teamAsset == Sleeve.DAVID && driveSystem.driveToPosition(680, DriveSystem.Direction.LEFT, 0.8))) {
                 return true;
             }
         }
@@ -181,12 +182,12 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
         switch (startPosition) {
             case START:
                 if (step == 0) {
-                    if (driveSystem.driveToPosition(1250 - currentPos, DriveSystem.Direction.FORWARD, .8)) {
+                    if (driveSystem.driveToPosition(1250 - currentPos, DriveSystem.Direction.FORWARD, 0.9)) {
                         step++;
                     }
                 }
                 if(step == 1){
-                    if(driveSystem.driveToPosition(250, DriveSystem.Direction.BACKWARD, 0.4)){
+                    if(driveSystem.driveToPosition(250, DriveSystem.Direction.BACKWARD, 0.6)){
                         step++;
                     }
                 }
@@ -207,7 +208,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
     private boolean reverseJunction() {
         int turn = park ? sign * 0 : sign * 90; //CHANGE!! real values should be 0 and 90
         if(step == 0){
-            if (driveSystem.driveToPosition(240, DriveSystem.Direction.BACKWARD, 0.4)){
+            if (driveSystem.driveToPosition(240, DriveSystem.Direction.BACKWARD, 0.6)){
                 step++;
             }
         }
@@ -233,33 +234,10 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
     }
 
 
-    private boolean intake_cone() {
-        //TODO make applicable for multiple cones and add ternary
-        if (step == 0 && armSystem.driveToLevel(Cone.FIVE.approach(), .3)) {
-            step++;
-        }
-        if (step == 1 &&
-               beamAlign(true, 5)){
-            step++;
-        }
-        if (step == 2 && (armSystem.intake() || armSystem.driveToLevel(Cone.FIVE.grab(), 0.3))) {
-            step++;
-        }
-        if (step == 3) {
-            if (armSystem.intake()) { // Complete the intake process -- i.e. stop
-                step++;
-            }
-        }
-        if (step == 4 && armSystem.driveToLevel(Cone.FIVE.clear(), 0.3)) {
-            newState(State.DRIVE_BACK_TO_POLE);
-            return true;
-        }
-        return false;
-    }
 
     private boolean drive_back_to_pole(){
         if(step == 0){
-            if(driveSystem.driveToPosition(500, DriveSystem.Direction.BACKWARD, 0.3)){
+            if(driveSystem.driveToPosition(500, DriveSystem.Direction.BACKWARD, 0.7)){
                 step++;
             }
         }
@@ -270,7 +248,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
             }
         }
         if(step == 2){
-            if(driveSystem.driveToPosition(30, DriveSystem.Direction.FORWARD, 0.3)){
+            if(driveSystem.driveToPosition(30, DriveSystem.Direction.FORWARD, 0.6)){
                 step = 0;
                 park = true;
                 return true;

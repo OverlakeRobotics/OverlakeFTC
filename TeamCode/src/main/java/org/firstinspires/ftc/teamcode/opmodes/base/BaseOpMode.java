@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.components.ArmSystem;
 import org.firstinspires.ftc.teamcode.components.DriveSystem;
 import org.firstinspires.ftc.teamcode.components.Lidar;
 import org.firstinspires.ftc.teamcode.components.PixyCam;
+import org.firstinspires.ftc.teamcode.opmodes.auto.CompetitionAutonomous;
 import org.firstinspires.ftc.teamcode.params.DriveParams;
 
 import java.util.EnumMap;
@@ -181,6 +182,28 @@ public abstract class BaseOpMode extends OpMode {
         if(armSystem.driveToLevel(ArmSystem.FLOOR,pow)){
             armSystem.armLeft.setPower(0);
             armSystem.armRight.setPower(0);
+            return true;
+        }
+        return false;
+    }
+    public boolean intake_cone(ArmSystem.Cone cone) {
+        //TODO make applicable for multiple cones and add ternary
+        if (step == 0 && armSystem.driveToLevel(cone.approach(), 0.6)) {
+            step++;
+        }
+        if (step == 1 &&
+                beamAlign(true, 0)){
+            step++;
+        }
+        if (step == 2 && (armSystem.intake() || armSystem.driveToLevel(cone.grab(), 0.6))) {
+            step++;
+        }
+        if (step == 3) {
+            if (armSystem.intake()) { // Complete the intake process -- i.e. stop
+                step++;
+            }
+        }
+        if (step == 4 && armSystem.driveToLevel(cone.clear(), 0.6)) {
             return true;
         }
         return false;

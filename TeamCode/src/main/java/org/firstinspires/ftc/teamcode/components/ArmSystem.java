@@ -16,6 +16,7 @@ public class ArmSystem {
     public static final int MEDIUM = 750;
     public static final int HIGH = 1100;
     public static final int FLOOR = 120;
+    public static final int BEACON = 250;
 
     public enum Cone {
         ONE (100),
