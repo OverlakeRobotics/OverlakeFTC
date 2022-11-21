@@ -22,14 +22,14 @@ public class ArmSystem {
         TWO (120),
         THREE (150),
         FOUR (190),
-        FIVE (330);
+        FIVE (360);
 
         private final int height;
         // Cone Stack Drop Distance
-        public static final int CONE_DROP = 70;
+        public static final int CONE_DROP = 80;
 
         // Cone Clear Distance
-        public static final int CONE_CLEAR = 100;
+        public static final int CONE_CLEAR = 110;
 
         Cone(int height) {
             this.height = height;
@@ -187,8 +187,8 @@ public class ArmSystem {
                     elapsedTime.reset();
                     intakeDelay = elapsedTime.milliseconds();
                 }
-                if(elapsedTime.milliseconds() - intakeDelay > 300){
-                    coneTake.setPower(0.05);
+                if(elapsedTime.milliseconds() - intakeDelay > 500){
+                    coneTake.setPower(0.1);
                     state = State.IDLE;
                 }
             } else if (state != State.INTAKING) {
@@ -209,7 +209,7 @@ public class ArmSystem {
 
             if (elapsedTime.milliseconds() > 100) {
                 state = State.IDLE;
-                coneTake.setPower(0);
+                coneTake.setPower(0.0);
             }
 
             return state == State.IDLE;

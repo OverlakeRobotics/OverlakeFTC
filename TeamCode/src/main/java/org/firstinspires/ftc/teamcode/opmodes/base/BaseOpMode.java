@@ -68,9 +68,9 @@ public abstract class BaseOpMode extends OpMode {
         telemetry.addData("offset", headingOffset);
         Log.d("degrees", headingOffset + " ");
         if (headingOffset > 1) {
-            driveSystem.drive(0.6f, 0, 0);
+            driveSystem.drive(0.7f, 0, 0);
         } else if (headingOffset < -1) {
-            driveSystem.drive(-0.6f, 0, 0);
+            driveSystem.drive(-0.7f, 0, 0);
         } else {
             driveSystem.setMotorPower(0);
             return true;
@@ -81,13 +81,13 @@ public abstract class BaseOpMode extends OpMode {
     protected boolean alignDistance(int colorSignature, int desiredWidth){
         distanceOffset = pixycam.distanceOffset(colorSignature, desiredWidth);// find actual desired width
         telemetry.addData("offset", distanceOffset);
-        Log.d("seeing", distanceOffset + " " + pixycam.getBiggestBlock().width);
+        Log.d("seeing", distanceOffset + " " + pixycam.GetBiggestBlock().width);
         if (distanceOffset > 5) {
             telemetry.addData("driving forward", 0);
-            driveSystem.drive(0, 0, -0.3f);
+            driveSystem.drive(0, 0, -0.5f);
         } else if (distanceOffset < -5) {
-            telemetry.addData("driving backwards", 0.3f);
-            driveSystem.drive(0, 0, 0.3f);
+            telemetry.addData("driving backwards", 8);
+            driveSystem.drive(0, 0, 0.5f);
         } else {
             telemetry.addData("stopping", 0);
             driveSystem.setMotorPower(0);
@@ -101,11 +101,13 @@ public abstract class BaseOpMode extends OpMode {
         return false;
     }
 
+
+
     protected boolean beamAlign(boolean cone, int mm){
         driveSystem.drive(0,0,-0.2f);
         if(!poleBeam.getState()){
             if(cone){
-                if(driveSystem.driveToPosition(mm, DriveSystem.Direction.FORWARD, 0.2)){
+                if(driveSystem.driveToPosition(mm, DriveSystem.Direction.FORWARD, 0.4)){
                     driveSystem.setMotorPower(0);
                     return true;
                 }
@@ -128,6 +130,12 @@ public abstract class BaseOpMode extends OpMode {
         }
         if(step == 1){
             if(alignDistance(colorSignature, desiredWidth)){
+                step++;
+            }
+        }
+
+        if(step == 2){
+            if(alignHeading(colorSignature)){
                 step = 0;
                 return true;
             }
@@ -137,10 +145,8 @@ public abstract class BaseOpMode extends OpMode {
 
     public boolean scoreDaCone(int level, boolean park){
         if(step == 0){
-            if(armSystem.driveToLevel(level-300, 0.7) && align(PixyCam.YELLOW, POLE_WIDTH)){
-                step +=2;
+            step+=2;
             }
-        }
 
         if(step == 2){
             if(armSystem.driveToLevel(level, 0.7)){
@@ -156,25 +162,18 @@ public abstract class BaseOpMode extends OpMode {
         }
 
         if(step == 4){
-            if(armSystem.driveToLevel(level-20, 0.3)){
-                step++;
-            }
-        }
-
-        if(step == 5){
             if(armSystem.outtake()){
-                step++;
-            }
-        }
-
-        if(step == 6){
-            if(armSystem.driveToLevel(level, 0.3)){
                 step = 0;
                 return true;
             }
         }
 
-
+//        if(step == 6){
+//            if(armSystem.driveToLevel(level, 0.3)){
+//                step = 0;
+//                return true;
+//            }
+//        }
         return false;
     }
 

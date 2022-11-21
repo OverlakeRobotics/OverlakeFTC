@@ -1,32 +1,29 @@
 package org.firstinspires.ftc.teamcode.components;
 
-import android.util.Log;
-
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchDevice;
 import com.qualcomm.robotcore.hardware.configuration.I2cSensor;
 import com.qualcomm.robotcore.util.TypeConversion;
 
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.TreeSet;
 
 @I2cSensor(name = "PixyCam", description = "PixyCam", xmlTag = "PixyCam")
-public class PixyCam extends I2cDeviceSynchDevice<I2cDeviceSynch> {
+public class PixyCam extends I2cDeviceSynchDevice<I2cDeviceSynch>
+{
 
     public static final int YELLOW = 3;
     public static final int BLUE = 1;
     public static final int RED = 2;
-    private Block[] blockSample;
-    private int index = 0;
-    private Integer headingOffset;
-    private Integer distanceOffset;
-
+    public ArrayList<Integer> arr;
+    public int avg;
 
     /**
      * Block describes the signature, location, and size of a detected block.
      */
-    public class Block  {
+    public class Block
+    {
         /**
          * A number from 1 through 7 corresponding to the color trained into the PixyCam,
          * or a sequence of octal digits corresponding to the multiple colors of a color code.
@@ -50,7 +47,8 @@ public class PixyCam extends I2cDeviceSynchDevice<I2cDeviceSynch> {
          */
         public final int width, height;
 
-        public Block(int signature, byte x, byte y, byte width, byte height) {
+        public Block(int signature, byte x, byte y, byte width, byte height)
+        {
             this.signature = signature;
             this.x = TypeConversion.unsignedByteToInt(x);
             this.y = TypeConversion.unsignedByteToInt(y);
@@ -59,7 +57,8 @@ public class PixyCam extends I2cDeviceSynchDevice<I2cDeviceSynch> {
         }
 
         @Override
-        public String toString() {
+        public String toString()
+        {
             return String.format("x: %d, y: %d, w: %d, h: %d", this.x, this.y, this.width, this.height);
         }
     }
@@ -73,7 +72,8 @@ public class PixyCam extends I2cDeviceSynchDevice<I2cDeviceSynch> {
      */
     private I2cDeviceSynch.ReadWindow[] legoProtocolSignatureQueryReadWindows;
 
-    public PixyCam(I2cDeviceSynch deviceSynch) {
+    public PixyCam(I2cDeviceSynch deviceSynch)
+    {
         super(deviceSynch, true);
 
         this.legoProtocolGeneralQueryReadWindow = new I2cDeviceSynch.ReadWindow(0x50, 6, I2cDeviceSynch.ReadMode.REPEAT);
@@ -84,13 +84,6 @@ public class PixyCam extends I2cDeviceSynchDevice<I2cDeviceSynch> {
         super.registerArmingStateCallback(false);
         this.deviceClient.setI2cAddress(I2cAddr.create7bit(1));
         this.deviceClient.engage();
-        blockSample = new Block[5];
-    }
-
-    public void reset() {
-        index = 0;
-        distanceOffset = null;
-        headingOffset = null;
     }
 
     private I2cDeviceSynch.ReadWindow NewLegoProtocolSignatureQueryReadWindow(int signature) {
@@ -106,9 +99,12 @@ public class PixyCam extends I2cDeviceSynchDevice<I2cDeviceSynch> {
      *
      * @return a Block object containing details about the location of the largest detected block
      */
-    public Block getBiggestBlock() {
+    public Block GetBiggestBlock()
+    {
         byte[] buffer = ReadEntireWindow(this.legoProtocolGeneralQueryReadWindow);
+
         int signature = buffer[1] << 8 | buffer[0];
+
         return new Block(signature, buffer[2], buffer[3], buffer[4], buffer[5]);
     }
 
@@ -116,54 +112,43 @@ public class PixyCam extends I2cDeviceSynchDevice<I2cDeviceSynch> {
      * @param signature is a scale between 1 and 7 corresponding to the signature trained into the PixyCam.
      * @return a Block object containing details about the location of the largest detected block for the specified signature.
      */
-    public Block getBiggestBlock(int signature) {
+    public Block GetBiggestBlock(int signature)
+    {
         if (signature < 1 || signature > 7)
             throw new IllegalArgumentException("signature must be between 1 and 7");
 
         byte[] buffer = ReadEntireWindow(this.legoProtocolSignatureQueryReadWindows[signature - 1]);
-        blockSample[index] = new Block(signature, buffer[1], buffer[2], buffer[3], buffer[4]);
-        Log.d("PixyCam", "index: " + index);
-        index++;
-        if (index == 5) {
-            index = 0;
-            Arrays.sort(blockSample, Comparator.comparingInt(b -> b.width));
-            return blockSample[2];
-        }
-        Log.d("PixyCam", "returning null");
-        return null;
-    }
 
+        return new Block(signature, buffer[1], buffer[2], buffer[3], buffer[4]);
+    }
     //returns the offset from the x direction
-    public Integer headingOffset(int signature) {
-        Block update = getBiggestBlock(signature);
-        if (update != null) {
-            headingOffset = update.x - 140;
-        }
-        return headingOffset;
+    public int headingOffset(int signature){
+        return GetBiggestBlock(signature).x - 140;
         //a negative value means rotate left a positive value means rotate right
     }
-
     //aligns the robot with the pole using pixycam and distances
-    public Integer distanceOffset(int signature, int desiredWidth) {
-        Block update = getBiggestBlock(signature);
-        if (update != null) {
-            distanceOffset = desiredWidth - update.width; //positive means move closer
-        }
-        return distanceOffset;
+    public int distanceOffset(int sign, int desiredWidth){
+        return desiredWidth - GetBiggestBlock(sign).width; //positive means move closer
+
     }
 
+
+
     @Override
-    protected boolean doInitialize() {
+    protected boolean doInitialize()
+    {
         return true;
     }
 
     @Override
-    public Manufacturer getManufacturer() {
+    public Manufacturer getManufacturer()
+    {
         return Manufacturer.Other;
     }
 
     @Override
-    public String getDeviceName() {
+    public String getDeviceName()
+    {
         return "PixyCam";
     }
 }
