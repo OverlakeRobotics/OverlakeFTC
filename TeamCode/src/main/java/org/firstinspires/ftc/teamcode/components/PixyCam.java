@@ -84,16 +84,13 @@ public class PixyCam extends I2cDeviceSynchDevice<I2cDeviceSynch>
         super.registerArmingStateCallback(false);
         this.deviceClient.setI2cAddress(I2cAddr.create7bit(1));
         this.deviceClient.engage();
-        arr = new ArrayList<>();
     }
 
-    private I2cDeviceSynch.ReadWindow NewLegoProtocolSignatureQueryReadWindow(int signature)
-    {
+    private I2cDeviceSynch.ReadWindow NewLegoProtocolSignatureQueryReadWindow(int signature) {
         return new I2cDeviceSynch.ReadWindow(0x50 + signature, 5, I2cDeviceSynch.ReadMode.REPEAT);
     }
 
-    private byte[] ReadEntireWindow(I2cDeviceSynch.ReadWindow readWindow)
-    {
+    private byte[] ReadEntireWindow(I2cDeviceSynch.ReadWindow readWindow) {
         this.deviceClient.setReadWindow(readWindow);
         return this.deviceClient.read(readWindow.getRegisterFirst(), readWindow.getRegisterCount());
     }

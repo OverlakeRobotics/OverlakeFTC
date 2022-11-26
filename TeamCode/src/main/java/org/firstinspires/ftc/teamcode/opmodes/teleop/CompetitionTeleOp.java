@@ -14,7 +14,8 @@ import org.firstinspires.ftc.teamcode.opmodes.base.BaseOpMode;
 @TeleOp(name = "Competition TeleOp", group="TeleOp")
 public class CompetitionTeleOp extends BaseOpMode {
 
-    private int cone = 4;
+    private ArmSystem.Cone[] coneTracker = ArmSystem.Cone.values();
+    private int i = 3;
 
     /**
      * Drives the motors based on the joystick sticks
@@ -42,7 +43,16 @@ public class CompetitionTeleOp extends BaseOpMode {
         }
 
         if(gamepad1.right_bumper){
-            //go to the con estack hegiht add member variable
+
+            ArmSystem.Cone cone = coneTracker[i];
+            armSystem.driveToLevel(cone.approach(), 0.6);
+        }
+
+        if(gamepad1.dpad_left){
+            i--;
+            if(i == -1){
+                i = 4;
+            }
         }
 
         if(gamepad1.left_bumper){
@@ -79,6 +89,10 @@ public class CompetitionTeleOp extends BaseOpMode {
 
         if (gamepad1.dpad_up) {
             armSystem.driveToLevel(ArmSystem.FLOOR, 0.3);
+        }
+
+        if(gamepad1.dpad_right){
+            armSystem.driveToLevel(ArmSystem.BEACON, 0.6);
         }
     }
 

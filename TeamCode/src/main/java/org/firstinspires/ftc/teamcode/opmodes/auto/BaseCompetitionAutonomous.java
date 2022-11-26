@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.teamcode.components.DriveSystem;
 import org.firstinspires.ftc.teamcode.components.PixyCam;
@@ -25,6 +26,7 @@ public class BaseCompetitionAutonomous extends BaseOpMode {
 
     protected Sleeve teamAsset;
     protected Vuforia vuforia;
+    protected DistanceSensor lidar;
     protected int currentPos;
 
     protected final String TAG = getClass().getSimpleName();

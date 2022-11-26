@@ -4,8 +4,12 @@ import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.components.DriveSystem;
+import org.firstinspires.ftc.teamcode.components.Lidar;
 import org.firstinspires.ftc.teamcode.components.PixyCam;
 import org.firstinspires.ftc.teamcode.opmodes.base.BaseOpMode;
 
@@ -15,6 +19,7 @@ public class PixyCamCenter extends BaseOpMode {
     protected PixyCam pixycam;
     private boolean stopRequested;
     private PixyCam.Block block;
+    protected DigitalChannel poleBeam;
     private int count;
     public boolean isTurning;
     public boolean isDriving;
@@ -30,6 +35,8 @@ public class PixyCamCenter extends BaseOpMode {
         count = 0;
         isTurning = false;
         isDriving = false;
+        poleBeam = hardwareMap.get(DigitalChannel.class, "pole beam");
+
 
 
     }
@@ -44,12 +51,12 @@ public class PixyCamCenter extends BaseOpMode {
         return this.stopRequested || Thread.currentThread().isInterrupted();
     }
     public void loop(){
-        block = pixycam.GetBiggestBlock(PixyCam.BLUE);
+        block = pixycam.GetBiggestBlock(PixyCam.YELLOW);
         Log.d("block ", block.toString());
         String s = block.width + " " + block.height;
         String coords = block.x + ", " + block.y;
-        int rotationOffset = pixycam.headingOffset(PixyCam.BLUE);
-        int distanceOffset = pixycam.distanceOffset(PixyCam.BLUE, 40);
+        int rotationOffset = pixycam.headingOffset(PixyCam.YELLOW);
+        int distanceOffset = pixycam.distanceOffset(PixyCam.YELLOW, 40);
 //        telemetry.addData("block", s);
 //        telemetry.addData("coords", coords);
         telemetry.addData("distanceOFfset", distanceOffset);
