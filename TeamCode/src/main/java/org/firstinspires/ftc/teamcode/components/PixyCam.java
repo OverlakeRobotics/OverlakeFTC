@@ -16,8 +16,12 @@ public class PixyCam extends I2cDeviceSynchDevice<I2cDeviceSynch>
     public static final int YELLOW = 3;
     public static final int BLUE = 1;
     public static final int RED = 2;
-    public ArrayList<Integer> arr;
-    public int avg;
+    public static final int SAMPLE_SIZE = 11;
+    private Block[] blockSample;
+    private int index = 0;
+    private Integer headingOffset;
+    private Integer distanceOffset;
+
 
     /**
      * Block describes the signature, location, and size of a detected block.
@@ -84,6 +88,13 @@ public class PixyCam extends I2cDeviceSynchDevice<I2cDeviceSynch>
         super.registerArmingStateCallback(false);
         this.deviceClient.setI2cAddress(I2cAddr.create7bit(1));
         this.deviceClient.engage();
+        blockSample = new Block[SAMPLE_SIZE];
+    }
+
+    public void reset() {
+        index = 0;
+        distanceOffset = null;
+        headingOffset = null;
     }
 
     private I2cDeviceSynch.ReadWindow NewLegoProtocolSignatureQueryReadWindow(int signature) {
@@ -121,11 +132,13 @@ public class PixyCam extends I2cDeviceSynchDevice<I2cDeviceSynch>
 
         return new Block(signature, buffer[1], buffer[2], buffer[3], buffer[4]);
     }
+
     //returns the offset from the x direction
     public int headingOffset(int signature){
         return GetBiggestBlock(signature).x - 140;
         //a negative value means rotate left a positive value means rotate right
     }
+
     //aligns the robot with the pole using pixycam and distances
     public int distanceOffset(int sign, int desiredWidth){
         return desiredWidth - GetBiggestBlock(sign).width; //positive means move closer
@@ -135,20 +148,17 @@ public class PixyCam extends I2cDeviceSynchDevice<I2cDeviceSynch>
 
 
     @Override
-    protected boolean doInitialize()
-    {
+    protected boolean doInitialize() {
         return true;
     }
 
     @Override
-    public Manufacturer getManufacturer()
-    {
+    public Manufacturer getManufacturer() {
         return Manufacturer.Other;
     }
 
     @Override
-    public String getDeviceName()
-    {
+    public String getDeviceName() {
         return "PixyCam";
     }
 }

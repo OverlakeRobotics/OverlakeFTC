@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.components.PixyCam;
 @Disabled
 public class CompetitionAutonomous extends BaseCompetitionAutonomous {
 
-    public static final int POLE_WIDTH = 40;;
+    public static final int POLE_WIDTH = 40;
     public static final int CONE_WIDTH = 100;
     private boolean park = false;
     public static final String TAG = "BaseCompetitionAutonomous";
@@ -150,7 +150,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
                     if(park){
                         newState(State.PARK);
                     }else{
-                        newState(State.ALIGN_WITH_CONE);
+                        newState(State.DRIVE_TO_CONE);
                     }
                 }
                 break;

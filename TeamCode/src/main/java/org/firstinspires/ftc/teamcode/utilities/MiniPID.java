@@ -1,4 +1,6 @@
-package org.firstinspires.ftc.teamcode.tools;
+package org.firstinspires.ftc.teamcode.utilities;
+
+import android.util.Log;
 
 /**
  * Small, easy to use PID implementation with advanced controller capability.<br>
@@ -21,7 +23,7 @@ public class MiniPID
     private double D = 0;
     private double F = 0;
 
-    private double maxIOutput = 0;
+    private double maxIOutput = 0.5;
     private double maxError = 0;
     public double errorSum = 0;
 
@@ -41,6 +43,8 @@ public class MiniPID
     private double outputFilter = 0;
 
     private double setpointRange = 0;
+
+    private static final String TAG = "MiniPID";
 
     //**********************************
     // Constructor functions
@@ -380,6 +384,7 @@ public class MiniPID
 
         // Get a test printline with lots of details about the internal
         // calculations. This can be useful for debugging.
+        Log.d(TAG, String.format("Final output %5.2f [ %5.2f, %5.2f , %5.2f  ], eSum %.2f",output,Poutput, Ioutput, Doutput,errorSum));
         // System.out.printf("Final output %5.2f [ %5.2f, %5.2f , %5.2f  ], eSum %.2f\n",output,Poutput, Ioutput, Doutput,errorSum );
         // System.out.printf("%5.2f\t%5.2f\t%5.2f\t%5.2f\n",output,Poutput, Ioutput, Doutput );
 

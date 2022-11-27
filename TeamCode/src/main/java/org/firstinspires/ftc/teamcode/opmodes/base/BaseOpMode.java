@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.components.Lidar;
 import org.firstinspires.ftc.teamcode.components.PixyCam;
 import org.firstinspires.ftc.teamcode.opmodes.auto.CompetitionAutonomous;
 import org.firstinspires.ftc.teamcode.params.DriveParams;
+import org.firstinspires.ftc.teamcode.utilities.MiniPID;
 
 import java.util.EnumMap;
 
@@ -31,9 +32,22 @@ public abstract class BaseOpMode extends OpMode {
     protected PixyCam pixycam;
     protected ArmSystem armSystem;
     protected DigitalChannel poleBeam;
+    private static final double HEADING_P = 0.006;
+    private static final double HEADING_I = 0.000;
+    private static final double HEADING_D = 0.000;
+
+    private static final String TAG = "BaseOpMode";
+
+    private static final double DISTANCE_P = 0.02;
+    private static final double DISTANCE_I = 0.00;
+    private static final double DISTANCE_D = 0.0;
     protected int step = 0;
-    boolean b = false;
-    int distanceOffset;
+    protected int cycleCount = 0;
+    protected float leftY;
+    protected float rightX;
+    MiniPID headingPID;
+    MiniPID distancePID;
+
 
 
     @Override
@@ -48,6 +62,18 @@ public abstract class BaseOpMode extends OpMode {
                 hardwareMap.get(DcMotor.class, "intake"),
                 hardwareMap.get(DigitalChannel.class, "beam")
         );
+        double hp = HEADING_P;
+        double hi = HEADING_I;
+        double hd = HEADING_D;
+        headingPID = new MiniPID(hp,hi,hd);
+        headingPID.setSetpoint(0);
+        headingPID.setOutputLimits(0.3,1.0);
+        double dp = DISTANCE_P;
+        double di = DISTANCE_I;
+        double dd = DISTANCE_D;
+        distancePID = new MiniPID(dp, di, dd);
+        distancePID.setSetpoint(0);
+        distancePID.setOutputLimits(-.5,.5);
     }
 
     private void setDriveSystem() {
@@ -64,36 +90,35 @@ public abstract class BaseOpMode extends OpMode {
         driveSystem = new DriveSystem(driveMap, imu);
     }
 
-    protected boolean alignHeading(int signature) {
-        int headingOffset = pixycam.headingOffset(signature);
-        telemetry.addData("offset", headingOffset);
-        Log.d("degrees", headingOffset + " ");
-        if (headingOffset > 1) {
-            driveSystem.drive(0.7f, 0, 0);
-        } else if (headingOffset < -1) {
-            driveSystem.drive(-0.7f, 0, 0);
+    protected boolean alignHeading(int colorSignature) {
+        Integer headingOffset = pixycam.headingOffset(colorSignature);// find actual desired width
+        Log.d(TAG, "heading offset: " + headingOffset);
+        double headingPIDOutput = -1 * headingPID.getOutput(headingOffset);
+        Log.d(TAG, "heading PID output: " + headingPIDOutput);
+        if (headingOffset > 2 || headingOffset < -2) {
+            rightX = (float)headingPIDOutput;
         } else {
-            driveSystem.setMotorPower(0);
+            Log.d(TAG, "heading aligned - incoming power:  " + rightX);
+            rightX = 0;
             return true;
         }
+        Log.d(TAG, "adjusted heading Power: " + rightX);
         return false;
     }
 
-    protected boolean alignDistance(int colorSignature, int desiredWidth){
-        distanceOffset = pixycam.distanceOffset(colorSignature, desiredWidth);// find actual desired width
-        telemetry.addData("offset", distanceOffset);
-        Log.d("seeing", distanceOffset + " " + pixycam.GetBiggestBlock().width);
-        if (distanceOffset > 5) {
-            telemetry.addData("driving forward", 0);
-            driveSystem.drive(0, 0, -0.5f);
-        } else if (distanceOffset < -5) {
-            telemetry.addData("driving backwards", 8);
-            driveSystem.drive(0, 0, 0.5f);
+    protected boolean alignDistance(int colorSignature, int desiredWidth) {
+        Integer distanceOffset = pixycam.distanceOffset(colorSignature, desiredWidth);// find actual desired width
+        Log.d(TAG, "distance offset: " + distanceOffset);
+        double distancePIDOutput = distancePID.getOutput(distanceOffset);
+        Log.d(TAG, "distance PID output: " + distancePIDOutput);
+        if (distanceOffset > 3 || distanceOffset < -3) {
+            leftY = (float)distancePIDOutput;
         } else {
-            telemetry.addData("stopping", 0);
-            driveSystem.setMotorPower(0);
+            Log.d(TAG, "distance aligned - incoming power:  " + leftY);
+            leftY = 0;
             return true;
         }
+        Log.d(TAG, "adjusted leftYPower: " + leftY);
         return false;
     }
 
@@ -124,23 +149,23 @@ public abstract class BaseOpMode extends OpMode {
 
 
     protected boolean align(int colorSignature, int desiredWidth){
-        if(step == 0){
-            if(alignHeading(colorSignature)){
-                step++;
+        cycleCount++;
+        telemetry.addData("cycle count ", cycleCount);
+        if(cycleCount == PixyCam.SAMPLE_SIZE) {
+            cycleCount = 0;
+            if (step == 0) {
+                if (alignHeading(colorSignature)) {
+                    step++;
+                }
             }
-        }
-        if(step == 1){
-            if(alignDistance(colorSignature, desiredWidth)){
-                step++;
+            if (step == 1) {
+                if (alignDistance(colorSignature, desiredWidth)) {
+                    return true;
+                }
             }
+            driveSystem.drive(rightX, 0, leftY);
         }
 
-        if(step == 2){
-            if(alignHeading(colorSignature)){
-                step = 0;
-                return true;
-            }
-        }
         return false;
     }
 

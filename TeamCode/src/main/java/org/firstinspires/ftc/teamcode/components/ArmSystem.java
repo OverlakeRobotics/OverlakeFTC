@@ -12,25 +12,25 @@ import org.firstinspires.ftc.teamcode.params.DriveParams;
 public class ArmSystem {
 
     // Pole Heights
-    public static final int LOW = 500;
-    public static final int MEDIUM = 750;
+    public static final int LOW = 550;
+    public static final int MEDIUM = 800;
     public static final int HIGH = 1100;
     public static final int FLOOR = 120;
-    public static final int BEACON = 250;
+    public static final int BEACON = 150;
 
     public enum Cone {
         ONE (100),
         TWO (120),
         THREE (150),
         FOUR (190),
-        FIVE (360);
+        FIVE (320);
 
         private final int height;
         // Cone Stack Drop Distance
-        public static final int CONE_DROP = 80;
+        public static final int CONE_DROP = 70;
 
         // Cone Clear Distance
-        public static final int CONE_CLEAR = 110;
+        public static final int CONE_CLEAR = 100;
 
         Cone(int height) {
             this.height = height;
