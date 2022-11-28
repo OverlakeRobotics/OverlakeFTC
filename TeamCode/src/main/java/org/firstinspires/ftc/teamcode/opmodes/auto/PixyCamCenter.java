@@ -35,10 +35,7 @@ public class PixyCamCenter extends BaseOpMode {
     protected double distancePIDOutput = 0;
     protected double headingPIDOutput = 0;
     protected int cycleCount = 0;
-    protected float leftY;
-    protected float rightX;
-    protected float lastLeftY;
-    protected float lastRightX;
+
     protected double debounce;
     protected Ramp ramp;
     protected double rampStart;
@@ -57,7 +54,7 @@ public class PixyCamCenter extends BaseOpMode {
 
     /** Initialization */
     public void init(){
-        color = pixycam.BLUE;
+        color = PixyCam.BLUE;
         super.init();
         // Timeouts to determine if stuck in loop
         // Initialize motors
