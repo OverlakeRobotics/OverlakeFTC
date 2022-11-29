@@ -67,7 +67,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
         time = new ElapsedTime();
         sign = teamSide == TeamSide.LEFT ? -1: 1;
         startPosition = From.START;
-        newState(State.IDENTIFY_TARGET);
+        newState(State.ALIGN_WITH_POLE);
     }
 
     /**
@@ -108,7 +108,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
                 break;
             case ALIGN_WITH_POLE:
                 if (align(PixyCam.YELLOW, POLE_WIDTH)) {
-                    newState(State.PLACE_CONE);
+                    newState(State.END_STATE);
                 }
 //                if ((time.seconds() - nowTime) >= 2) {
 //                    newState(State.REVERSE_JUNCTION);

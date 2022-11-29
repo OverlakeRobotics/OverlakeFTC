@@ -65,14 +65,14 @@ public class PixyCamCenter extends BaseOpMode {
         hd = HEADING_D;
         headingPID = new MiniPID(hp,hi,hd);
         headingPID.setSetpoint(0);
-        headingPID.setOutputLimits(0.2,1.0);
+        headingPID.setOutputLimits(0.25,1.0);
 
         dp = DISTANCE_P;
         di = DISTANCE_I;
         dd = DISTANCE_D;
         distancePID = new MiniPID(dp, di, dd);
         distancePID.setSetpoint(0);
-        distancePID.setOutputLimits(-.5,.5);
+        distancePID.setOutputLimits(0.25,1.0);
         elapsedTime = new ElapsedTime();
         ramp = new ExponentialRamp(new Point(0,.1), new Point(500,1));
 
@@ -145,7 +145,7 @@ public class PixyCamCenter extends BaseOpMode {
         if (cycleCount == PixyCam.SAMPLE_SIZE) {
             cycleCount = 0;
             alignHeading(colorSignature);
-            alignDistance(colorSignature, desiredWidth);
+            //alignDistance(colorSignature, desiredWidth);
         }
       //  ecoMode();
         driveSystem.drive(rightX, 0, leftY);

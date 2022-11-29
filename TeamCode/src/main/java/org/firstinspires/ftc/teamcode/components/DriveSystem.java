@@ -154,12 +154,10 @@ public class DriveSystem {
             leftY = 0.0f;
         }
 
-        double slowTurn = 0.8;
-
-        double frontLeftPower  = -leftY + (slowTurn * rightX) + leftX;
-        double frontRightPower = -leftY - (slowTurn * rightX) - leftX;
-        double backLeftPower   = -leftY + (slowTurn * rightX) - leftX;
-        double backRightPower  = -leftY - (slowTurn * rightX) + leftX;
+        double frontLeftPower  = -leftY + (rightX) + leftX;
+        double frontRightPower = -leftY - (rightX) - leftX;
+        double backLeftPower   = -leftY + (rightX) - leftX;
+        double backRightPower  = -leftY - (rightX) + leftX;
 
         motors.forEach((name, motor) -> {
             switch(name) {
@@ -186,7 +184,6 @@ public class DriveSystem {
      * @param direction The direction the robot is moving in
      * @param maxPower The maximum power of the motors
      */
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public boolean driveToPositionTicks(int ticks, Direction direction, double maxPower) {
         // Initialize target position
         if(mTargetTicks == 0) {

@@ -32,15 +32,16 @@ public abstract class BaseOpMode extends OpMode {
     protected PixyCam pixycam;
     protected ArmSystem armSystem;
     protected DigitalChannel poleBeam;
-    private static final double HEADING_P = 0.006;
+
+    private static final String TAG = "BaseOpMode";
+    private static final double HEADING_P = 0.008;
     private static final double HEADING_I = 0.000;
     private static final double HEADING_D = 0.000;
 
-    private static final String TAG = "BaseOpMode";
-
-    private static final double DISTANCE_P = 0.02;
+    private static final double DISTANCE_P = 0.011;
     private static final double DISTANCE_I = 0.00;
     private static final double DISTANCE_D = 0.0;
+
     protected int step = 0;
     protected int cycleCount = 0;
     protected float leftY;
@@ -67,13 +68,13 @@ public abstract class BaseOpMode extends OpMode {
         double hd = HEADING_D;
         headingPID = new MiniPID(hp,hi,hd);
         headingPID.setSetpoint(0);
-        headingPID.setOutputLimits(0.3,1.0);
+        headingPID.setOutputLimits(0.25,1);
         double dp = DISTANCE_P;
         double di = DISTANCE_I;
         double dd = DISTANCE_D;
         distancePID = new MiniPID(dp, di, dd);
         distancePID.setSetpoint(0);
-        distancePID.setOutputLimits(-.5,.5);
+        distancePID.setOutputLimits(0.25,1);
     }
 
     private void setDriveSystem() {
@@ -96,7 +97,7 @@ public abstract class BaseOpMode extends OpMode {
         if (headingOffset == null) return false;
         double headingPIDOutput = Math.signum(headingOffset) * headingPID.getOutput(headingOffset);
         Log.d(TAG, "heading PID output: " + headingPIDOutput);
-        if (headingOffset > 2 || headingOffset < -2) {
+        if (headingOffset > 3 || headingOffset < -3) {
             rightX = (float)headingPIDOutput;
         } else {
             Log.d(TAG, "heading aligned - incoming power:  " + rightX);
@@ -111,6 +112,7 @@ public abstract class BaseOpMode extends OpMode {
     protected boolean alignDistance(int colorSignature, int desiredWidth) {
         Integer distanceOffset = pixycam.distanceOffset(colorSignature, desiredWidth);// find actual desired width
         Log.d(TAG, "distance offset: " + distanceOffset);
+        if(distanceOffset == null) return false;
         double distancePIDOutput = distancePID.getOutput(distanceOffset);
         Log.d(TAG, "distance PID output: " + distancePIDOutput);
         if (distanceOffset > 3 || distanceOffset < -3) {
@@ -162,6 +164,13 @@ public abstract class BaseOpMode extends OpMode {
             }
             if (step == 1) {
                 if (alignDistance(colorSignature, desiredWidth)) {
+                    step++;
+                }
+            }
+            if(step == 2){
+                headingPID.reset();
+                if(alignHeading(colorSignature)){
+                    step = 0;
                     return true;
                 }
             }
@@ -231,6 +240,7 @@ public abstract class BaseOpMode extends OpMode {
             }
         }
         if (step == 4 && armSystem.driveToLevel(cone.clear(), 0.6)) {
+            step = 0;
             return true;
         }
         return false;
