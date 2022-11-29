@@ -20,33 +20,18 @@ import org.firstinspires.ftc.teamcode.utilities.scale.Ramp;
 public class PixyCamCenter extends BaseOpMode {
 
     private static final String TAG = "PixyCamCenter";
-    private static final double HEADING_P = 0.005;
-    private static final double HEADING_I = 0.000;
-    private static final double HEADING_D = 0.000;
 
-    private static final double DISTANCE_P = 0.008;
-    private static final double DISTANCE_I = 0.00;
-    private static final double DISTANCE_D = 0.0;
-
-    protected PixyCam pixycam;
     private boolean pidReset = false;
-    protected MiniPID headingPID;
-    protected MiniPID distancePID;
-    protected double distancePIDOutput = 0;
-    protected double headingPIDOutput = 0;
-    protected int cycleCount = 0;
-
+    
     protected double debounce;
-    protected Ramp ramp;
-    protected double rampStart;
 
-    private double hp;
-    private double hi;
-    private double hd;
+    private double hp = HEADING_P;
+    private double hi = HEADING_I;
+    private double hd = HEADING_D;
 
-    private double dp;
-    private double di;
-    private double dd;
+    private double dp = DISTANCE_P;
+    private double di = DISTANCE_I;
+    private double dd = DISTANCE_D;
 
     private ElapsedTime elapsedTime;
 
@@ -54,28 +39,9 @@ public class PixyCamCenter extends BaseOpMode {
 
     /** Initialization */
     public void init(){
-        color = PixyCam.BLUE;
         super.init();
-        // Timeouts to determine if stuck in loop
-        // Initialize motors
-        pixycam = hardwareMap.get(PixyCam.class, "pixy");
-
-        hp = HEADING_P;
-        hi = HEADING_I;
-        hd = HEADING_D;
-        headingPID = new MiniPID(hp,hi,hd);
-        headingPID.setSetpoint(0);
-        headingPID.setOutputLimits(0.25,1.0);
-
-        dp = DISTANCE_P;
-        di = DISTANCE_I;
-        dd = DISTANCE_D;
-        distancePID = new MiniPID(dp, di, dd);
-        distancePID.setSetpoint(0);
-        distancePID.setOutputLimits(0.25,1.0);
+        color = PixyCam.BLUE;
         elapsedTime = new ElapsedTime();
-        ramp = new ExponentialRamp(new Point(0,.1), new Point(500,1));
-
     }
 
     @Override

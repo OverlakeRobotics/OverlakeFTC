@@ -34,20 +34,20 @@ public abstract class BaseOpMode extends OpMode {
     protected DigitalChannel poleBeam;
 
     private static final String TAG = "BaseOpMode";
-    private static final double HEADING_P = 0.008;
-    private static final double HEADING_I = 0.000;
-    private static final double HEADING_D = 0.000;
+    protected static final double HEADING_P = 0.005;
+    protected static final double HEADING_I = 0.000;
+    protected static final double HEADING_D = 0.000;
 
-    private static final double DISTANCE_P = 0.011;
-    private static final double DISTANCE_I = 0.00;
-    private static final double DISTANCE_D = 0.0;
+    protected static final double DISTANCE_P = 0.008;
+    protected static final double DISTANCE_I = 0.00;
+    protected static final double DISTANCE_D = 0.0;
 
     protected int step = 0;
     protected int cycleCount = 0;
     protected float leftY;
     protected float rightX;
-    MiniPID headingPID;
-    MiniPID distancePID;
+    protected MiniPID headingPID;
+    protected MiniPID distancePID;
 
 
 
@@ -63,16 +63,11 @@ public abstract class BaseOpMode extends OpMode {
                 hardwareMap.get(DcMotor.class, "intake"),
                 hardwareMap.get(DigitalChannel.class, "beam")
         );
-        double hp = HEADING_P;
-        double hi = HEADING_I;
-        double hd = HEADING_D;
-        headingPID = new MiniPID(hp,hi,hd);
+
+        headingPID = new MiniPID(HEADING_P,HEADING_I,HEADING_D);
         headingPID.setSetpoint(0);
         headingPID.setOutputLimits(0.25,1);
-        double dp = DISTANCE_P;
-        double di = DISTANCE_I;
-        double dd = DISTANCE_D;
-        distancePID = new MiniPID(dp, di, dd);
+        distancePID = new MiniPID(DISTANCE_P, DISTANCE_I, DISTANCE_D);
         distancePID.setSetpoint(0);
         distancePID.setOutputLimits(0.25,1);
     }
@@ -95,7 +90,7 @@ public abstract class BaseOpMode extends OpMode {
         Integer headingOffset = pixycam.headingOffset(colorSignature); // find actual desired width
         Log.d(TAG, "heading offset: " + headingOffset);
         if (headingOffset == null) return false;
-        double headingPIDOutput = Math.signum(headingOffset) * headingPID.getOutput(headingOffset);
+        double headingPIDOutput = -headingPID.getOutput(headingOffset);
         Log.d(TAG, "heading PID output: " + headingPIDOutput);
         if (headingOffset > 3 || headingOffset < -3) {
             rightX = (float)headingPIDOutput;
