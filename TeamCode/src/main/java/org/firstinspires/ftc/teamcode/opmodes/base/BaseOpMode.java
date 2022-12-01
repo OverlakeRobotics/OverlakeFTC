@@ -34,22 +34,19 @@ public abstract class BaseOpMode extends OpMode {
     protected DigitalChannel poleBeam;
 
     private static final String TAG = "BaseOpMode";
-    protected static final double HEADING_P = 0.005;
-    protected static final double HEADING_I = 0.000;
+    protected static final double HEADING_P = 0.009;
+    protected static final double HEADING_I = 0.00;
     protected static final double HEADING_D = 0.000;
 
-    protected static final double DISTANCE_P = 0.008;
+    protected static final double DISTANCE_P = 0.02;
     protected static final double DISTANCE_I = 0.00;
     protected static final double DISTANCE_D = 0.0;
 
     protected int step = 0;
-    protected int cycleCount = 0;
     protected float leftY;
     protected float rightX;
     protected MiniPID headingPID;
     protected MiniPID distancePID;
-
-
 
     @Override
     public void init(){
@@ -66,10 +63,10 @@ public abstract class BaseOpMode extends OpMode {
 
         headingPID = new MiniPID(HEADING_P,HEADING_I,HEADING_D);
         headingPID.setSetpoint(0);
-        headingPID.setOutputLimits(0.25,1);
+        headingPID.setOutputLimits(-.5,.5);
         distancePID = new MiniPID(DISTANCE_P, DISTANCE_I, DISTANCE_D);
         distancePID.setSetpoint(0);
-        distancePID.setOutputLimits(0.25,1);
+        distancePID.setOutputLimits(-1,1);
     }
 
     private void setDriveSystem() {
@@ -90,13 +87,14 @@ public abstract class BaseOpMode extends OpMode {
         Integer headingOffset = pixycam.headingOffset(colorSignature); // find actual desired width
         Log.d(TAG, "heading offset: " + headingOffset);
         if (headingOffset == null) return false;
-        double headingPIDOutput = -headingPID.getOutput(headingOffset);
+        double headingPIDOutput = headingPID.getOutput(headingOffset);
         Log.d(TAG, "heading PID output: " + headingPIDOutput);
         if (headingOffset > 3 || headingOffset < -3) {
-            rightX = (float)headingPIDOutput;
+            rightX = (float)-headingPIDOutput;
         } else {
             Log.d(TAG, "heading aligned - incoming power:  " + rightX);
             rightX = 0;
+            headingPID.reset();
             return true;
         }
         Log.d(TAG, "adjusted heading Power: " + rightX);
@@ -115,6 +113,7 @@ public abstract class BaseOpMode extends OpMode {
         } else {
             Log.d(TAG, "distance aligned - incoming power:  " + leftY);
             leftY = 0;
+            distancePID.reset();
             return true;
         }
         Log.d(TAG, "adjusted leftYPower: " + leftY);
@@ -148,37 +147,35 @@ public abstract class BaseOpMode extends OpMode {
 
 
     protected boolean align(int colorSignature, int desiredWidth){
-        cycleCount++;
-        telemetry.addData("cycle count ", cycleCount);
-        if(cycleCount == PixyCam.SAMPLE_SIZE) {
-            cycleCount = 0;
-            if (step == 0) {
-                if (alignHeading(colorSignature)) {
-                    step++;
-                }
+
+        if (step == 0) {
+            if (alignHeading(colorSignature)) {
+                step++;
             }
-            if (step == 1) {
-                if (alignDistance(colorSignature, desiredWidth)) {
-                    step++;
-                }
-            }
-            if(step == 2){
-                headingPID.reset();
-                if(alignHeading(colorSignature)){
-                    step = 0;
-                    return true;
-                }
-            }
-            driveSystem.drive(rightX, 0, leftY);
         }
+        if (step == 1) {
+            if (alignDistance(colorSignature, desiredWidth)) {
+                step++;
+            }
+        }
+        if(step == 2){
+            headingPID.reset();
+            if(alignHeading(colorSignature)){
+                step = 0;
+                return true;
+            }
+        }
+        driveSystem.drive(rightX, 0, leftY);
 
         return false;
     }
 
     public boolean scoreDaCone(int level, boolean park){
         if(step == 0){
-            step+=2;
+            if (armSystem.driveToLevel(level - 200, .7) && align(PixyCam.YELLOW,POLE_WIDTH)) {
+                step += 2;
             }
+         }
 
         if(step == 2){
             if(armSystem.driveToLevel(level, 0.7)){

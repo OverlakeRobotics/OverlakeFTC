@@ -17,9 +17,6 @@ public class PixyCam extends I2cDeviceSynchDevice<I2cDeviceSynch> {
     public static final int YELLOW = 3;
     public static final int BLUE = 1;
     public static final int RED = 2;
-    public static final int SAMPLE_SIZE = 11;
-    private Block[] blockSample;
-    private int index = 0;
     private Integer headingOffset;
     private Integer distanceOffset;
 
@@ -85,11 +82,9 @@ public class PixyCam extends I2cDeviceSynchDevice<I2cDeviceSynch> {
         super.registerArmingStateCallback(false);
         this.deviceClient.setI2cAddress(I2cAddr.create7bit(1));
         this.deviceClient.engage();
-        blockSample = new Block[SAMPLE_SIZE];
     }
 
     public void reset() {
-        index = 0;
         distanceOffset = null;
         headingOffset = null;
     }
@@ -122,33 +117,18 @@ public class PixyCam extends I2cDeviceSynchDevice<I2cDeviceSynch> {
             throw new IllegalArgumentException("signature must be between 1 and 7");
 
         byte[] buffer = ReadEntireWindow(this.legoProtocolSignatureQueryReadWindows[signature - 1]);
-        blockSample[index] = new Block(signature, buffer[1], buffer[2], buffer[3], buffer[4]);
-        index++;
-        if (index == SAMPLE_SIZE) {
-            index = 0;
-            Arrays.sort(blockSample, Comparator.comparingInt(b -> b.width));
-            return blockSample[SAMPLE_SIZE/2];
-        }
-        return null;
+        return new Block(signature, buffer[1], buffer[2], buffer[3], buffer[4]);
     }
 
     //returns the offset from the x direction
-    public Integer headingOffset(int signature) {
-        Block update = getBiggestBlock(signature);
-        if (update != null) {
-            headingOffset = update.x - 128;
-        }
-        return headingOffset;
+    public int headingOffset(int signature) {
+        return getBiggestBlock(signature).x - 128;
         //a negative value means rotate left a positive value means rotate right
     }
 
     //aligns the robot with the pole using pixycam and distances
-    public Integer distanceOffset(int signature, int desiredWidth) {
-        Block update = getBiggestBlock(signature);
-        if (update != null) {
-            distanceOffset = desiredWidth - update.width; //positive means move closer
-        }
-        return distanceOffset;
+    public int distanceOffset(int signature, int desiredWidth) {
+        return desiredWidth - getBiggestBlock(signature).width;
     }
 
     @Override
