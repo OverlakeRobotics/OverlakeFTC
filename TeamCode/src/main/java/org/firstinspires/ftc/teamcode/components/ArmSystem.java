@@ -16,7 +16,7 @@ public class ArmSystem {
     public static final int MEDIUM = 800;
     public static final int HIGH = 1120;
     public static final int FLOOR = 120;
-    public static final int BEACON = 150;
+    public static final int BEACON = 180;
 
     public enum Cone {
         ONE (100),
@@ -101,6 +101,10 @@ public class ArmSystem {
         return intake.intake();
     }
 
+    public boolean intake(double pow){
+        return intake.intake(pow);
+    }
+
 
     public boolean outtake(){
         return intake.outtake();
@@ -182,7 +186,6 @@ public class ArmSystem {
 
         public boolean intake(){
 
-
             if (isBeamBroken()) {
                 if(intakeDelay < 0 ){
                     elapsedTime.reset();
@@ -198,6 +201,25 @@ public class ArmSystem {
                 coneTake.setPower(0.75);
             }
             return state == State.IDLE;
+        }
+
+        public boolean intake(double pow){
+            if (isBeamBroken()) {
+                if (intakeDelay < 0) {
+                    elapsedTime.reset();
+                    intakeDelay = elapsedTime.milliseconds();
+                }
+                if (elapsedTime.milliseconds() - intakeDelay > 500) {
+                    coneTake.setPower(0);
+                    state = State.IDLE;
+                }
+            }
+            else if (state != State.INTAKING) {
+                    state = State.INTAKING;
+                    coneTake.setDirection(DcMotor.Direction.REVERSE);
+                    coneTake.setPower(pow);
+                }
+                return state == State.IDLE;
         }
 
         public boolean outtake(){

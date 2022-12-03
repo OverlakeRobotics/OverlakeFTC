@@ -122,7 +122,7 @@ public class PixyCam extends I2cDeviceSynchDevice<I2cDeviceSynch> {
 
     //returns the offset from the x direction
     public int headingOffset(int signature) {
-        return getBiggestBlock(signature).x - 128;
+        return getBiggestBlock(signature).x - 138;
         //a negative value means rotate left a positive value means rotate right
     }
 

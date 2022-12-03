@@ -34,19 +34,20 @@ public abstract class BaseOpMode extends OpMode {
     protected DigitalChannel poleBeam;
 
     private static final String TAG = "BaseOpMode";
-    protected static final double HEADING_P = 0.009;
+    protected static final double HEADING_P = 0.011;
     protected static final double HEADING_I = 0.00;
-    protected static final double HEADING_D = 0.000;
+    protected static final double HEADING_D = 0.011;
 
     protected static final double DISTANCE_P = 0.02;
-    protected static final double DISTANCE_I = 0.00;
-    protected static final double DISTANCE_D = 0.0;
+    protected static final double DISTANCE_I = 0.03;
+    protected static final double DISTANCE_D = 0.003;
 
     protected int step = 0;
     protected float leftY;
     protected float rightX;
     protected MiniPID headingPID;
     protected MiniPID distancePID;
+    protected DcMotor light;
 
     @Override
     public void init(){
@@ -54,11 +55,13 @@ public abstract class BaseOpMode extends OpMode {
         poleBeam = hardwareMap.get(DigitalChannel.class, "pole beam");
         poleBeam.setMode(DigitalChannel.Mode.INPUT);
         pixycam = hardwareMap.get(PixyCam.class, "pixy");
+        light = hardwareMap.get(DcMotor.class, "light");
         armSystem = new ArmSystem(
                 hardwareMap.get(DcMotor.class, "arm_right"),
                 hardwareMap.get(DcMotor.class, "arm_left"),
                 hardwareMap.get(DcMotor.class, "intake"),
                 hardwareMap.get(DigitalChannel.class, "beam")
+
         );
 
         headingPID = new MiniPID(HEADING_P,HEADING_I,HEADING_D);
@@ -90,11 +93,12 @@ public abstract class BaseOpMode extends OpMode {
         double headingPIDOutput = headingPID.getOutput(headingOffset);
         Log.d(TAG, "heading PID output: " + headingPIDOutput);
         if (headingOffset > 3 || headingOffset < -3) {
+            //rightX = (float)(Math.abs(headingPIDOutput) < 0.2 ? (-0.2 * Math.signum(headingPIDOutput)) : -headingPIDOutput);
             rightX = (float)-headingPIDOutput;
         } else {
             Log.d(TAG, "heading aligned - incoming power:  " + rightX);
+            driveSystem.setMotorPower(0);
             rightX = 0;
-            headingPID.reset();
             return true;
         }
         Log.d(TAG, "adjusted heading Power: " + rightX);
@@ -108,7 +112,8 @@ public abstract class BaseOpMode extends OpMode {
         if(distanceOffset == null) return false;
         double distancePIDOutput = distancePID.getOutput(distanceOffset);
         Log.d(TAG, "distance PID output: " + distancePIDOutput);
-        if (distanceOffset > 3 || distanceOffset < -3) {
+        if (distanceOffset > 2 || distanceOffset < -2) {
+            //leftY = (float)(Math.abs(distancePIDOutput) < 0.1 ? (0.1 * Math.signum(distancePIDOutput)) : distancePIDOutput);
             leftY = (float)distancePIDOutput;
         } else {
             Log.d(TAG, "distance aligned - incoming power:  " + leftY);
@@ -147,21 +152,27 @@ public abstract class BaseOpMode extends OpMode {
 
 
     protected boolean align(int colorSignature, int desiredWidth){
+        if(step == 0){
+            headingPID.reset();
+            step++;
+        }
 
-        if (step == 0) {
+        if (step == 1) {
             if (alignHeading(colorSignature)) {
                 step++;
+                distancePID.reset();
             }
         }
-        if (step == 1) {
+        if (step == 2) {
             if (alignDistance(colorSignature, desiredWidth)) {
                 step++;
+                headingPID.reset();
             }
         }
-        if(step == 2){
-            headingPID.reset();
+        if(step == 3){
             if(alignHeading(colorSignature)){
                 step = 0;
+                headingPID.reset();
                 return true;
             }
         }
@@ -172,10 +183,16 @@ public abstract class BaseOpMode extends OpMode {
 
     public boolean scoreDaCone(int level, boolean park){
         if(step == 0){
-            if (armSystem.driveToLevel(level - 200, .7) && align(PixyCam.YELLOW,POLE_WIDTH)) {
-                step += 2;
-            }
+            step+=2;
+//            if (armSystem.driveToLevel(level-300, .7)) {
+//                step+=2;
+//            }
          }
+        if(step == 1){
+            if(align(PixyCam.YELLOW, POLE_WIDTH)){
+                step++;
+            }
+        }
 
         if(step == 2){
             if(armSystem.driveToLevel(level, 0.7)){
@@ -184,7 +201,10 @@ public abstract class BaseOpMode extends OpMode {
         }
 
         if(step == 3){
-            if(beamAlign(park, 45)){
+//            if(beamAlign(park, 45)){
+//                step++;
+//            }
+            if(driveSystem.driveToPosition(150, DriveSystem.Direction.FORWARD, 0.4)){
                 step++;
             }
             //drive forward

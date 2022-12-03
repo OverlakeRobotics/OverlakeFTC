@@ -33,7 +33,8 @@ public class CompetitionTeleOp extends BaseOpMode {
         telemetry.addData("arm right encoder ", armSystem.armRight.getCurrentPosition());
         telemetry.addData("arm left power",  armSystem.armLeft.getPower());
         telemetry.addData("arm right power", armSystem.armRight.getPower());
-        telemetry.addData("Right X", gamepad1.right_stick_x);
+        telemetry.addData("Right X", Math.pow(gamepad2.right_stick_x, 3));
+        telemetry.addData("Left Y", Math.pow(gamepad2.left_stick_y, 3));
 
 
 
@@ -56,7 +57,7 @@ public class CompetitionTeleOp extends BaseOpMode {
         }
 
         if(gamepad1.left_bumper){
-            //
+            armSystem.intake(0.4);
         }
 
         if (gamepad1.right_trigger > 0 || armSystem.getState() == OUTTAKING) {

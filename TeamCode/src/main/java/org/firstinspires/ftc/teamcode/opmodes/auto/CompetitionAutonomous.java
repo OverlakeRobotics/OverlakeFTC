@@ -67,7 +67,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
         time = new ElapsedTime();
         sign = teamSide == TeamSide.LEFT ? -1: 1;
         startPosition = From.START;
-        newState(State.ALIGN_WITH_POLE);
+        newState(State.IDENTIFY_TARGET);
     }
 
     /**
@@ -108,7 +108,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
                 break;
             case ALIGN_WITH_POLE:
                 if (align(PixyCam.YELLOW, POLE_WIDTH)) {
-                    newState(State.END_STATE);
+                    newState(State.PLACE_CONE);
                 }
 //                if ((time.seconds() - nowTime) >= 2) {
 //                    newState(State.REVERSE_JUNCTION);
@@ -208,7 +208,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
     private boolean reverseJunction() {
         int turn = park ? sign * 0 : sign * 90; //CHANGE!! real values should be 0 and 90
         if(step == 0){
-            if (driveSystem.driveToPosition(240, DriveSystem.Direction.BACKWARD, 0.6)){
+            if (driveSystem.driveToPosition(180, DriveSystem.Direction.BACKWARD, 0.6)){
                 step++;
             }
         }
