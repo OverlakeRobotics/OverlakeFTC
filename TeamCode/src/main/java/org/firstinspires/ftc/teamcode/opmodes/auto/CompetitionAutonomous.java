@@ -170,8 +170,8 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
     private boolean park() {
         if (step == 0) {
             if (teamAsset == Sleeve.BRIAN ||
-                    (teamAsset == Sleeve.TEAM && driveSystem.driveToPosition(680, DriveSystem.Direction.RIGHT, 0.8)) ||
-                    (teamAsset == Sleeve.DAVID && driveSystem.driveToPosition(680, DriveSystem.Direction.LEFT, 0.8))) {
+                    (teamAsset == Sleeve.TEAM && driveSystem.driveToPosition(600, DriveSystem.Direction.RIGHT, 0.8)) ||
+                    (teamAsset == Sleeve.DAVID && driveSystem.driveToPosition(550, DriveSystem.Direction.LEFT, 0.8))) {
                 return true;
             }
         }

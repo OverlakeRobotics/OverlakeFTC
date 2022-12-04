@@ -34,8 +34,8 @@ public abstract class BaseOpMode extends OpMode {
     protected DigitalChannel poleBeam;
 
     private static final String TAG = "BaseOpMode";
-    protected static final double HEADING_P = 0.011;
-    protected static final double HEADING_I = 0.00;
+    protected static final double HEADING_P = 0.0145;
+    protected static final double HEADING_I = 0.0;
     protected static final double HEADING_D = 0.011;
 
     protected static final double DISTANCE_P = 0.02;
@@ -112,7 +112,7 @@ public abstract class BaseOpMode extends OpMode {
         if(distanceOffset == null) return false;
         double distancePIDOutput = distancePID.getOutput(distanceOffset);
         Log.d(TAG, "distance PID output: " + distancePIDOutput);
-        if (distanceOffset > 2 || distanceOffset < -2) {
+        if (distanceOffset > 1 || distanceOffset < -1) {
             //leftY = (float)(Math.abs(distancePIDOutput) < 0.1 ? (0.1 * Math.signum(distancePIDOutput)) : distancePIDOutput);
             leftY = (float)distancePIDOutput;
         } else {
