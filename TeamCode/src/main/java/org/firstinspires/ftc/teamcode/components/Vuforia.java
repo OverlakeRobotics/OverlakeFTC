@@ -54,7 +54,9 @@ public class Vuforia {
     private OpenGLMatrix lastLocation = null;
     private VuforiaLocalizer vuforia = null;
     public VuforiaTrackables targetsPictures;
+    public VuforiaTrackables targetsAsset;
     private List<VuforiaTrackable> allTrackables;
+    private List<VuforiaTrackable> teamAssetTrackables;
 
     public Vuforia(HardwareMap hardwareMap, CameraChoice choice) {
         vuforia = setCamera(hardwareMap, choice);
@@ -141,19 +143,25 @@ public class Vuforia {
                 break;
         }
         vuforia = new VuforiaLocalizer(parameters);
-        initializeTrackables(vuforia, "PowerPlay");
+        initializeTrackables(vuforia, "PowerPlay", "FTCPowerPlay");
 
         return vuforia;
     }
 
-    private void initializeTrackables(VuforiaLocalizer vuforia, String game) {
+    private void initializeTrackables(VuforiaLocalizer vuforia, String game, String asset) {
         //load the trackable pictures, TODO change the game name
         targetsPictures = vuforia.loadTrackablesFromAsset(game);
+        targetsAsset = vuforia.loadTrackablesFromAsset(asset);
+        // load the trackable from team code asset
+
+        teamAssetTrackables = new ArrayList<VuforiaTrackable>();
+        teamAssetTrackables.addAll(targetsAsset);
 
 
         // For convenience, gather together all the trackable objects in one easily-iterable collection */
         allTrackables = new ArrayList<VuforiaTrackable>();
         allTrackables.addAll(targetsPictures);
+
 
 
 
@@ -183,6 +191,7 @@ public class Vuforia {
 //            ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
 
             targetsPictures.activate();
+            targetsAsset.activate();
         }
 
 
@@ -192,6 +201,26 @@ public class Vuforia {
         aTarget.setName(targetName);
         aTarget.setLocation(OpenGLMatrix.translation(dx, dy, dz)
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, rx, ry, rz)));
+    }
+
+    public int identifyTeamAsset(){
+        int i = 0;
+        for (VuforiaTrackable trackable : teamAssetTrackables) {
+            if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
+                return i;
+            }
+            i++;
+        }
+        return -1;
+    }
+
+    public boolean isTeamAssetVisible(){
+        for (VuforiaTrackable trackable : teamAssetTrackables) {
+            if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

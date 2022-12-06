@@ -70,12 +70,12 @@ public class DriveSystem {
 
     /** Initializes motors
      */
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public void initMotors() {
         motors.forEach((name, motor) -> {
             // Reset encoders
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             // Set motor directions to drive forwards
             switch(name) {
                 case FRONTLEFT:
@@ -142,7 +142,6 @@ public class DriveSystem {
      * @param leftX Left X joystick value
      * @param leftY Left Y joystick value in case you couldn't tell from the others
      */
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public void drive(float rightX, float leftX, float leftY) {
         // Prevent small values from causing the robot to drift
         if (Math.abs(rightX) < 0.01) {
@@ -155,10 +154,10 @@ public class DriveSystem {
             leftY = 0.0f;
         }
 
-        double frontLeftPower  = -leftY + rightX + leftX;
-        double frontRightPower = -leftY - rightX - leftX;
-        double backLeftPower   = -leftY + rightX - leftX;
-        double backRightPower  = -leftY - rightX + leftX;
+        double frontLeftPower  = -leftY + (rightX) + leftX;
+        double frontRightPower = -leftY - (rightX) - leftX;
+        double backLeftPower   = -leftY + (rightX) - leftX;
+        double backRightPower  = -leftY - (rightX) + leftX;
 
         motors.forEach((name, motor) -> {
             switch(name) {
@@ -185,12 +184,12 @@ public class DriveSystem {
      * @param direction The direction the robot is moving in
      * @param maxPower The maximum power of the motors
      */
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public boolean driveToPositionTicks(int ticks, Direction direction, double maxPower) {
         // Initialize target position
         if(mTargetTicks == 0) {
             driveToPositionInit(ticks, direction, maxPower);
         }
+        mTargetTicks = direction == Direction.BACKWARD ? -ticks : ticks;
         // Determine distance from desired target and stop if within acceptable tolerance
         for (DcMotor motor : motors.values()) {
             Log.i("MOTOR", motor.getCurrentPosition() + "");
@@ -212,11 +211,11 @@ public class DriveSystem {
                 switch(name) {
                     case FRONTLEFT:
                     case BACKLEFT:
-                        motor.setPower(correction > 0 ? 1 - sign * correction: 1);
+                        motor.setPower(correction > 0 ? maxPower - sign * correction: maxPower);
                         break;
                     case FRONTRIGHT:
                     case BACKRIGHT:
-                        motor.setPower(correction < 0 ? 1 + sign * correction : 1);
+                        motor.setPower(correction < 0 ? maxPower + sign * correction : maxPower);
                         break;
                 }
             });
@@ -253,7 +252,7 @@ public class DriveSystem {
                         motor.setTargetPosition(sign * -mTargetTicks);
                         break;
                 }
-            // Driving forwards or backwards:
+                // Driving forwards or backwards:
             } else {
                 motor.setTargetPosition(mTargetTicks);
             }
@@ -268,8 +267,9 @@ public class DriveSystem {
      * @param direction sets which direction to go
      * @param maxPower sets the power to run at
      */
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public boolean driveToPosition(int millimeters, Direction direction, double maxPower) {
+    public boolean driveToPosition(int millimeters, Direction direction, double maxPower)
+    {
+        Log.d("going to ", millimeters + " " + direction);
         return driveToPositionTicks(millimetersToTicks(millimeters), direction, maxPower);
     }
 
@@ -302,7 +302,6 @@ public class DriveSystem {
      * @param maxPower The maximum power of the motors
      * @return if on heading
      */
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public boolean turnAbsolute(double degrees, double maxPower) {
         return turn(diffFromAbs(degrees), maxPower);
     }
@@ -313,7 +312,6 @@ public class DriveSystem {
      * @param maxPower The maximum power of the motors
      * @return if on heading
      */
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public boolean turn(double degrees, double maxPower) {
         // If controller hub is vertical, use pitch instead of heading
         double heading = DriveParams.IMU_VERT ? imuSystem.getPitch() : imuSystem.getHeading();
@@ -326,41 +324,52 @@ public class DriveSystem {
         // How far off the target heading are we?
         double difference = mTargetHeading - heading;
         Log.d(TAG,"Difference: " + difference);
-        return onHeading(maxPower, heading);
+        return onHeading(maxPower, heading, difference);
 
+    }
+
+
+
+    public boolean turnRight(double maxPower){
+        return turn(-90, maxPower);
+    }
+
+    public boolean turnLeft(double maxPower){
+        return turn(90, maxPower);
     }
 
     /**
      * Perform one cycle of closed loop heading control.
-     * @param speed Desired speed of turn
      * @param heading current heading
      * @return if it finished its turn
      */
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public boolean onHeading(double speed, double heading) {
+    public double getError(double heading){
+        return heading - mTargetHeading;
+    }
+    public boolean onHeading(double speed, double heading, double difference) {
+        double steer;
         double leftSpeed;
+        double rightSpeed;
 
         // determine turn power based on +/- error
-        double error = computeDegreesDiff();
-        Log.d(TAG, "Error: " + error);
+        double error = difference;
 
-        // If it gets there: stop
         if (Math.abs(error) <= DriveParams.HEADING_THRESHOLD) {
             mTargetHeading = 0;
             setMotorPower(0);
             return true;
         }
 
-        // Go full speed until 60% there
-        leftSpeed = Math.abs(error) / DriveParams.FULL_POWER_UNTIL;
+        steer = getSteer(error);
+        leftSpeed  = speed * steer;
+        rightSpeed   = -1 * leftSpeed;
 
-        Log.d(TAG, "Left Speed: " + leftSpeed);
-        leftSpeed = Range.clip(leftSpeed, DriveParams.MIN_SPEED, 1.0);
 
+        Log.d(TAG,"Left Speed:" + leftSpeed);
+        Log.d(TAG, "Right Speed:" + rightSpeed);
         // Send desired speeds to motors.
-        tankDrive(leftSpeed * Math.signum(error), -leftSpeed * Math.signum(error));
-        Log.d(TAG, "Left Speed Post Tank Drive " + leftSpeed);
-        Log.d(TAG, "Left Power" + motors.get(MotorNames.FRONTLEFT).getPower());
+        tankDrive(leftSpeed, rightSpeed);
+
         return false;
     }
 
@@ -415,7 +424,7 @@ public class DriveSystem {
 
     // Currently 3.51
     private double ticksInMm() {
-        return DriveParams.TICKS_PER_REV / inchesToMm(DriveParams.CIRCUMFERENCE);
+        return DriveParams.TICKS_IN_MM;
     }
 
     /**
