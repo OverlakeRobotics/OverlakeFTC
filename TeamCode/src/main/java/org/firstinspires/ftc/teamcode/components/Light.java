@@ -4,18 +4,32 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 public class Light {
 
-    private DigitalChannel led;
+    private DigitalChannel redLed;
+    private DigitalChannel greenLed;
+    private DigitalChannel blueLed;
+
 
     public Light(DigitalChannel led) {
-        this.led = led;
+        this.redLed = led;
         led.setMode(DigitalChannel.Mode.OUTPUT);
     }
 
     public void on() {
-        led.setState(true);
+        redLed.setState(true);
     }
 
     public void off() {
-        led.setState(false);
+        redLed.setState(false);
+    }
+
+    public void allOff(){
+        redLed.setState(false);
+        greenLed.setState(false);
+        blueLed.setState(false);
+    }
+
+    public void yellowOn(){
+        redLed.setState(true);
+        greenLed.setState(true);
     }
 }
