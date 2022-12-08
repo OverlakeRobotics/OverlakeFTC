@@ -12,8 +12,8 @@ import org.firstinspires.ftc.teamcode.params.DriveParams;
 public class ArmSystem {
 
     // Pole Heights
-    public static final int LOW = 530;
-    public static final int MEDIUM = 780;
+    public static final int LOW = 490;
+    public static final int MEDIUM = 792;
     public static final int HIGH = 1120;
     public static final int FLOOR = 120;
     public static final int BEACON = 180;
@@ -93,6 +93,14 @@ public class ArmSystem {
     public static void armToFloor() {
     }
 
+    public void armUp(){
+        driveToLevel(armLeft.getCurrentPosition() + 10, 0.3);
+    }
+
+    public void armDown(){
+        driveToLevel(armLeft.getCurrentPosition() - 10, 0.3);
+    }
+
     public Intake.State getState(){
         return intake.getState();
     }
@@ -101,9 +109,8 @@ public class ArmSystem {
         return intake.intake();
     }
 
-    public boolean intake(double pow){
-        return intake.intake(pow);
-    }
+
+
 
 
     public boolean outtake(){
@@ -201,25 +208,6 @@ public class ArmSystem {
                 coneTake.setPower(0.75);
             }
             return state == State.IDLE;
-        }
-
-        public boolean intake(double pow){
-            if (isBeamBroken()) {
-                if (intakeDelay < 0) {
-                    elapsedTime.reset();
-                    intakeDelay = elapsedTime.milliseconds();
-                }
-                if (elapsedTime.milliseconds() - intakeDelay > 500) {
-                    coneTake.setPower(0);
-                    state = State.IDLE;
-                }
-            }
-            else if (state != State.INTAKING) {
-                    state = State.INTAKING;
-                    coneTake.setDirection(DcMotor.Direction.REVERSE);
-                    coneTake.setPower(pow);
-                }
-                return state == State.IDLE;
         }
 
         public boolean outtake(){

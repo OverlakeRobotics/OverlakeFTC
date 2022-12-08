@@ -50,15 +50,12 @@ public class CompetitionTeleOp extends BaseOpMode {
         }
 
         if(gamepad1.dpad_left){
-            i--;
-            if(i == -1){
-                i = 4;
-            }
+            armSystem.armDown();
         }
 
-        if(gamepad1.left_bumper){
-            armSystem.intake(0.4);
-        }
+//        if(gamepad1.left_bumper|| armSystem.getState() == INTAKING){
+//            armSystem.intake(0.3);
+//        }
 
         if (gamepad1.right_trigger > 0 || armSystem.getState() == OUTTAKING) {
             armSystem.outtake();

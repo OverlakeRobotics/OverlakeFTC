@@ -47,7 +47,7 @@ public class BaseCompetitionAutonomous extends BaseOpMode {
             return;
         }
         telemetry.addData("signal sleeve?: ", vuforia.identifyTeamAsset());
-        telemetry.addData("heading", driveSystem.imuSystem.getHeading());
+        telemetry.addData("heading", imuSystem.getHeading());
         telemetry.update();
 
         identifySleeve();

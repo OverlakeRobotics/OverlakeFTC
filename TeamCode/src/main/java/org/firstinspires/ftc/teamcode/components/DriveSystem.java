@@ -58,6 +58,14 @@ public class DriveSystem {
         imuSystem = new IMUSystem(imu);
     }
 
+    public DriveSystem(EnumMap<MotorNames, DcMotor> motors, IMUSystem imu){
+        this.motors = motors;
+        mTargetTicks = 0;
+        initMotors();
+        imuSystem = imu;
+
+    }
+
     /**
      * Handles the data for the abstract creation of a drive system with four wheels without IMU
      */

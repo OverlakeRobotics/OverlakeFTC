@@ -108,7 +108,12 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
                 break;
             case ALIGN_WITH_POLE:
                 if (align(PixyCam.YELLOW, POLE_WIDTH)) {
-                    newState(State.PLACE_CONE);
+                    if(bail){
+                        newState(State.PARK);
+                    }
+                    else {
+                        newState(State.PLACE_CONE);
+                    }
                 }
 //                if ((time.seconds() - nowTime) >= 2) {
 //                    newState(State.REVERSE_JUNCTION);
