@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.teamcode.components.DriveSystem;
-import org.firstinspires.ftc.teamcode.components.PixyCam;
+import org.firstinspires.ftc.teamcode.components.Pixy2;
 import org.firstinspires.ftc.teamcode.components.Vuforia;
 import org.firstinspires.ftc.teamcode.opmodes.base.BaseOpMode;
 

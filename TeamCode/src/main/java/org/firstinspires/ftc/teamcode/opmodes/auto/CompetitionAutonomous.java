@@ -9,8 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.components.ArmSystem;
 import org.firstinspires.ftc.teamcode.components.ArmSystem.Cone;
 import org.firstinspires.ftc.teamcode.components.DriveSystem;
-import org.firstinspires.ftc.teamcode.components.PixyCam;
-
+import org.firstinspires.ftc.teamcode.components.Pixy2;
 @Disabled
 public class CompetitionAutonomous extends BaseCompetitionAutonomous {
 
@@ -107,7 +106,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
                 }
                 break;
             case ALIGN_WITH_POLE:
-                if (align(PixyCam.YELLOW, POLE_WIDTH)) {
+                if (align(Pixy2.YELLOW, POLE_WIDTH)) {
                     newState(State.PLACE_CONE);
                 }
 //                if ((time.seconds() - nowTime) >= 2) {
@@ -130,7 +129,7 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
                 }
                 break;
             case ALIGN_WITH_CONE:
-                int color = teamColor == TeamColor.BLUE ? PixyCam.BLUE : PixyCam.RED;
+                int color = teamColor == TeamColor.BLUE ? Pixy2.BLUE : Pixy2.RED;
                 if (align(color, CONE_WIDTH)) {
                     newState(State.INTAKE_CONE);
                 }

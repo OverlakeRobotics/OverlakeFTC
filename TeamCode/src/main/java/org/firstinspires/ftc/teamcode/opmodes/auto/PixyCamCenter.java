@@ -9,7 +9,7 @@ import android.util.Log;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.components.PixyCam;
+import org.firstinspires.ftc.teamcode.components.Pixy2;
 import org.firstinspires.ftc.teamcode.opmodes.base.BaseOpMode;
 import org.firstinspires.ftc.teamcode.utilities.MiniPID;
 import org.firstinspires.ftc.teamcode.utilities.scale.ExponentialRamp;
@@ -40,7 +40,7 @@ public class PixyCamCenter extends BaseOpMode {
     /** Initialization */
     public void init(){
         super.init();
-        color = PixyCam.BLUE;
+        color = Pixy2.BLUE;
         elapsedTime = new ElapsedTime();
     }
 
@@ -53,11 +53,11 @@ public class PixyCamCenter extends BaseOpMode {
     public void loop(){
 
         if (gamepad1.x) {
-            color = PixyCam.BLUE;
+            color = Pixy2.BLUE;
         }
 
         if (gamepad1.y) {
-            color = PixyCam.YELLOW;
+            color = Pixy2.YELLOW;
         }
 
 
@@ -69,7 +69,7 @@ public class PixyCamCenter extends BaseOpMode {
                 headingPID.reset();
                 pidReset = true;
             }
-            int width = color == PixyCam.BLUE ? CONE_WIDTH : POLE_WIDTH;
+            int width = color == Pixy2.BLUE ? CONE_WIDTH : POLE_WIDTH;
             align(color, width);
         } else {
             pidReset = false;
@@ -118,16 +118,16 @@ public class PixyCamCenter extends BaseOpMode {
 
 
     private void telemetryData() {
-        telemetry.addData("Color: ", color == PixyCam.BLUE ? "Blue" : "Yellow");
+        telemetry.addData("Color: ", color == Pixy2.BLUE ? "Blue" : "Yellow");
 
-        if (color == PixyCam.BLUE) {
-            int blueDistanceOffset = pixycam.distanceOffset(PixyCam.BLUE, CONE_WIDTH);
-            int blueRotationOffset = pixycam.headingOffset(PixyCam.BLUE);
+        if (color == Pixy2.BLUE) {
+            int blueDistanceOffset = pixycam.distanceOffset(Pixy2.BLUE, CONE_WIDTH);
+            int blueRotationOffset = pixycam.headingOffset(Pixy2.BLUE);
             telemetry.addData("Blue Distance Offset", blueDistanceOffset);
             telemetry.addData("Blue Rotation Offset", blueRotationOffset);
         } else {
-            int yellowDistanceOffset = pixycam.distanceOffset(PixyCam.YELLOW, POLE_WIDTH);
-            int yellowRotationOffset = pixycam.headingOffset(PixyCam.YELLOW);
+            int yellowDistanceOffset = pixycam.distanceOffset(Pixy2.YELLOW, POLE_WIDTH);
+            int yellowRotationOffset = pixycam.headingOffset(Pixy2.YELLOW);
             telemetry.addData("Yellow Distance Offset", yellowDistanceOffset);
             telemetry.addData("Yellow Rotation Offset", yellowRotationOffset);
         }

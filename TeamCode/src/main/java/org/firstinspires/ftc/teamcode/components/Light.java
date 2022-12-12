@@ -11,7 +11,7 @@ public class Light {
 
     public Light(DigitalChannel led) {
         this.redLed = led;
-        led.setMode(DigitalChannel.Mode.OUTPUT);
+        redLed.setMode(DigitalChannel.Mode.OUTPUT);
     }
 
     public void on() {

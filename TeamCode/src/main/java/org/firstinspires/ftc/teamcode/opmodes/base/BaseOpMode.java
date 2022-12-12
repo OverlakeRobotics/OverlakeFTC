@@ -16,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.components.ArmSystem;
 import org.firstinspires.ftc.teamcode.components.DriveSystem;
 import org.firstinspires.ftc.teamcode.components.Lidar;
-import org.firstinspires.ftc.teamcode.components.PixyCam;
+import org.firstinspires.ftc.teamcode.components.Pixy2;
 import org.firstinspires.ftc.teamcode.opmodes.auto.CompetitionAutonomous;
 import org.firstinspires.ftc.teamcode.params.DriveParams;
 import org.firstinspires.ftc.teamcode.utilities.MiniPID;
@@ -29,7 +29,7 @@ import java.util.EnumMap;
 public abstract class BaseOpMode extends OpMode {
 
     protected DriveSystem driveSystem;
-    protected PixyCam pixycam;
+    protected Pixy2 pixycam;
     protected ArmSystem armSystem;
     protected DigitalChannel poleBeam;
 
@@ -54,7 +54,7 @@ public abstract class BaseOpMode extends OpMode {
         setDriveSystem();
         poleBeam = hardwareMap.get(DigitalChannel.class, "pole beam");
         poleBeam.setMode(DigitalChannel.Mode.INPUT);
-        pixycam = hardwareMap.get(PixyCam.class, "pixy");
+        pixycam = hardwareMap.get(Pixy2.class, "pixy");
         light = hardwareMap.get(DcMotor.class, "light");
         armSystem = new ArmSystem(
                 hardwareMap.get(DcMotor.class, "arm_right"),
@@ -189,7 +189,7 @@ public abstract class BaseOpMode extends OpMode {
 //            }
          }
         if(step == 1){
-            if(align(PixyCam.YELLOW, POLE_WIDTH)){
+            if(align(Pixy2.YELLOW, POLE_WIDTH)){
                 step++;
             }
         }

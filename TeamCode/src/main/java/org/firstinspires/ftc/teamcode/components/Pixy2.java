@@ -14,6 +14,11 @@ import java.nio.ByteOrder;
 @I2cDeviceType
 @DeviceProperties(name = "Pixycam2 ", description = "Pixycam 2 color sensor", xmlTag = "pixycam2")
 public class Pixy2 extends I2cDeviceSynchDevice<I2cDeviceSynch> {
+    public static final int YELLOW = 3;
+    public static final int BLUE = 1;
+    public static final int RED = 2;
+    private Integer headingOffset;
+    private Integer distanceOffset;
 
     private static final String TAG = "Pixy2";
     public static final short REQUEST = (short) 0xc1ae;
@@ -119,6 +124,16 @@ public class Pixy2 extends I2cDeviceSynchDevice<I2cDeviceSynch> {
     /**
      * Block describes the signature, location, and size of a detected block.
      */
+    //returns the offset from the x direction
+    public int headingOffset(int signature) {
+        return getBlock(signature).x - 138;
+        //a negative value means rotate left a positive value means rotate right
+    }
+
+    //aligns the robot with the pole using pixycam and distances
+    public int distanceOffset(int signature, int desiredWidth) {
+        return desiredWidth - getBlock(signature).width;
+    }
     public class Block  {
         /**
          * A number from 1 through 7 corresponding to the color trained into the PixyCam,
