@@ -87,7 +87,7 @@ public abstract class BaseOpMode extends OpMode {
     }
 
     protected boolean alignHeading(int colorSignature) {
-        Integer headingOffset = pixycam.headingOffset(colorSignature); // find actual desired width
+        Integer headingOffset = pixycam.headingOffset(colorSignature);
         Log.d(TAG, "heading offset: " + headingOffset);
         if (headingOffset == null) return false;
         double headingPIDOutput = headingPID.getOutput(headingOffset);

@@ -125,14 +125,24 @@ public class Pixy2 extends I2cDeviceSynchDevice<I2cDeviceSynch> {
      * Block describes the signature, location, and size of a detected block.
      */
     //returns the offset from the x direction
-    public int headingOffset(int signature) {
-        return getBlock(signature).x - 138;
+    public Integer headingOffset(int signature) {
+        if(getBlock(signature) != null) {
+            return getBlock(signature).x - 138;
+        }
+        else{
+            return null;
+        }
         //a negative value means rotate left a positive value means rotate right
     }
 
     //aligns the robot with the pole using pixycam and distances
-    public int distanceOffset(int signature, int desiredWidth) {
-        return desiredWidth - getBlock(signature).width;
+    public Integer distanceOffset(int signature, int desiredWidth) {
+        if(getBlock(signature) != null){
+            return desiredWidth - getBlock(signature).width;
+        }
+        else{
+            return null;
+        }
     }
     public class Block  {
         /**

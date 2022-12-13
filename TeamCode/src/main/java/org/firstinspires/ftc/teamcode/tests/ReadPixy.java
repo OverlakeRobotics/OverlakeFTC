@@ -20,7 +20,7 @@ public class ReadPixy extends OpMode
 
     @Override
     public void loop() {
-        Pixy2.Block block = pixy.getBlock(1);
+        Pixy2.Block block = pixy.getBlock(3);
         if (block != null) {
             telemetry.addData("x: ", block.x);
             telemetry.addData("y: ", block.y);
@@ -35,6 +35,6 @@ public class ReadPixy extends OpMode
     public void stop() {
         super.stop();
         pixy.setLED(0,0,0);
-        //pixy.lampOff();
+        pixy.lampOff();
     }
 }

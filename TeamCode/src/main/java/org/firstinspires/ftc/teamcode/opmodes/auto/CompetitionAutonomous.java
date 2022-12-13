@@ -48,6 +48,8 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
         LEFT
     }
 
+
+
     private From startPosition;
     private State mCurrentState;                         // Current State Machine State.
 
@@ -67,6 +69,8 @@ public class CompetitionAutonomous extends BaseCompetitionAutonomous {
         sign = teamSide == TeamSide.LEFT ? -1: 1;
         startPosition = From.START;
         newState(State.IDENTIFY_TARGET);
+        pixycam.lampOn();
+        pixycam.setLED(0, 0, 0);
     }
 
     /**

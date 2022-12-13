@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.components.ArmSystem;
 import org.firstinspires.ftc.teamcode.components.Light;
-import org.firstinspires.ftc.teamcode.components.PixyCam;
+import org.firstinspires.ftc.teamcode.components.Pixy2;
 import org.firstinspires.ftc.teamcode.opmodes.base.BaseOpMode;
 
 @TeleOp(name = "pixy lights", group = "Tests")
@@ -33,7 +33,7 @@ public class PixyCamLightTest extends BaseOpMode {
     public void init_loop() {
         if (gamepad1.b) {
             if (gamepad1.left_bumper) {
-                targetColor = PixyCam.RED;
+                targetColor = Pixy2.RED;
             } else {
                 color = red;
             }
@@ -45,7 +45,7 @@ public class PixyCamLightTest extends BaseOpMode {
 
         if (gamepad1.x) {
             if (gamepad1.left_bumper) {
-                targetColor = PixyCam.BLUE;
+                targetColor = Pixy2.BLUE;
             } else {
                 color = blue;
             }
@@ -53,7 +53,7 @@ public class PixyCamLightTest extends BaseOpMode {
 
         if (gamepad1.y) {
             if (gamepad1.left_bumper) {
-                targetColor = PixyCam.YELLOW;
+                targetColor = Pixy2.YELLOW;
             } else {
                 color.off();
                 color = null;
@@ -72,7 +72,7 @@ public class PixyCamLightTest extends BaseOpMode {
     private void telemetryData() {
         String color = getColor();
         telemetry.addData("Target Color: ", color);
-        int distanceOffset = pixycam.distanceOffset(targetColor, targetColor == PixyCam.YELLOW ? POLE_WIDTH : CONE_WIDTH);
+        int distanceOffset = pixycam.distanceOffset(targetColor, targetColor == Pixy2.YELLOW ? POLE_WIDTH : CONE_WIDTH);
         int headingOffset = pixycam.headingOffset(targetColor);
         telemetry.addData(color + " Distance Offset", distanceOffset);
         telemetry.addData(color + " Rotation Offset", headingOffset);
@@ -81,11 +81,11 @@ public class PixyCamLightTest extends BaseOpMode {
 
     private String getColor() {
         switch (targetColor) {
-            case PixyCam.BLUE:
+            case Pixy2.BLUE:
                 return "Blue";
-            case PixyCam.RED:
+            case Pixy2.RED:
                 return "Red";
-            case PixyCam.YELLOW:
+            case Pixy2.YELLOW:
                 return "Yellow";
         }
         return "";
