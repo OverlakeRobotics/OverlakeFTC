@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.tests;
 import static org.firstinspires.ftc.teamcode.opmodes.auto.CompetitionAutonomous.CONE_WIDTH;
 import static org.firstinspires.ftc.teamcode.opmodes.auto.CompetitionAutonomous.POLE_WIDTH;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -13,65 +14,71 @@ import org.firstinspires.ftc.teamcode.components.Pixy2;
 import org.firstinspires.ftc.teamcode.opmodes.base.BaseOpMode;
 
 @TeleOp(name = "pixy lights", group = "Tests")
-public class PixyCamLightTest extends BaseOpMode {
+public class PixyCamLightTest extends OpMode {
 
-    Light color;
-    Light red;
-    Light green;
-    Light blue;
     int targetColor;
+    Pixy2 pixycam;
 
     /** Initialization */
     public void init(){
-        super.init();
-        red = new Light(hardwareMap.get(DigitalChannel.class,"red"));
-        green = new Light(hardwareMap.get(DigitalChannel.class,"green"));
-        blue = new Light(hardwareMap.get(DigitalChannel.class,"blue"));
+        pixycam = hardwareMap.get(Pixy2.class, "pixy");
+
     }
 
     @Override
-    public void init_loop() {
-        if (gamepad1.b) {
-            if (gamepad1.left_bumper) {
-                targetColor = Pixy2.RED;
-            } else {
-                color = red;
-            }
-        }
+    public void start() {
+        super.start();
+        pixycam.lampOn();
+    }
 
-        if (gamepad1.a) {
-            color = green;
+    @Override
+    public void loop() {
+
+        if (gamepad1.b) {
+            setColor(Pixy2.RED);
         }
 
         if (gamepad1.x) {
-            if (gamepad1.left_bumper) {
-                targetColor = Pixy2.BLUE;
-            } else {
-                color = blue;
-            }
+            setColor(Pixy2.BLUE);
         }
 
         if (gamepad1.y) {
-            if (gamepad1.left_bumper) {
-                targetColor = Pixy2.YELLOW;
-            } else {
-                color.off();
-                color = null;
-            }
+            setColor(Pixy2.YELLOW);
         }
 
-        if (color != null) {
-            color.on();
-        }
         telemetryData();
+
     }
 
-    @Override
-    public void loop() { }
+    private void setColor(int color) {
+        if (targetColor != color) {
+            targetColor = color;
+            setLED();
+        }
+    }
+
+    private void setLED() {
+        int red = 0;
+        int green =  0;
+        int blue = 0;
+        switch (targetColor) {
+            case Pixy2.BLUE:
+                blue = 1;
+                break;
+            case Pixy2.RED:
+                red = 1;
+                break;
+            case Pixy2.YELLOW:
+               red = 1;
+               green = 1;
+               break;
+        }
+        pixycam.setLED(red, green, blue);
+    }
 
     private void telemetryData() {
         String color = getColor();
-        telemetry.addData("Target Color: ", color);
+        telemetry.addData("Target Color: ", getColor());
         int distanceOffset = pixycam.distanceOffset(targetColor, targetColor == Pixy2.YELLOW ? POLE_WIDTH : CONE_WIDTH);
         int headingOffset = pixycam.headingOffset(targetColor);
         telemetry.addData(color + " Distance Offset", distanceOffset);
@@ -91,4 +98,9 @@ public class PixyCamLightTest extends BaseOpMode {
         return "";
     }
 
+    @Override
+    public void stop() {
+        super.stop();
+        pixycam.lampOff();
+    }
 }
