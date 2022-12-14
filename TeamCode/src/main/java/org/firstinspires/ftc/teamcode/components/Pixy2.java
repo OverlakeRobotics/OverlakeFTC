@@ -84,15 +84,16 @@ public class Pixy2 extends I2cDeviceSynchDevice<I2cDeviceSynch> {
         this.deviceClient.write(request);
     }
 
-    public Block getBlock(int signature) {
+    public Block getBlock(int signature) { //pass in 2^n-1 with n being the signature, for multiple add!
+        int signum = (int) Math.pow(2, signature - 1);
         if (elapsedTime.milliseconds() > lastPoll + 50) {
             lastPoll = elapsedTime.milliseconds();
-            byte[] request = Type.GET_BLOCKS.request(signature,1);
+            byte[] request = Type.GET_BLOCKS.request(signum,1);
             this.deviceClient.write(request,I2cWaitControl.NONE);
             byte[] response = this.deviceClient.read(0, 20);
             int responseSignature = getSignature(response);
             if (responseSignature == signature) {
-                return new Block(signature, response);
+                return new Block(signature, response);// TODO fix.
             }
         }
         return null;
@@ -126,8 +127,9 @@ public class Pixy2 extends I2cDeviceSynchDevice<I2cDeviceSynch> {
      */
     //returns the offset from the x direction
     public Integer headingOffset(int signature) {
-        if(getBlock(signature) != null) {
-            return getBlock(signature).x - 138;
+        Block b = getBlock(signature);
+        if(b != null) {
+            return b.x - 158;
         }
         else{
             return null;
@@ -137,8 +139,9 @@ public class Pixy2 extends I2cDeviceSynchDevice<I2cDeviceSynch> {
 
     //aligns the robot with the pole using pixycam and distances
     public Integer distanceOffset(int signature, int desiredWidth) {
-        if(getBlock(signature) != null){
-            return desiredWidth - getBlock(signature).width;
+        Block b = getBlock(signature);
+        if(b != null){
+            return desiredWidth - b.width;
         }
         else{
             return null;

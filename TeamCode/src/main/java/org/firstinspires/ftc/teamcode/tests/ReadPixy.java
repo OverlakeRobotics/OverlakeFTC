@@ -14,7 +14,7 @@ public class ReadPixy extends OpMode
     @Override
     public void init() {
         pixy  = hardwareMap.get(Pixy2.class, "pixy");
-        //pixy.lampOn();
+        pixy.lampOn();
         pixy.setLED(255,255,0);
     }
 
