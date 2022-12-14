@@ -34,7 +34,7 @@ public abstract class BaseOpMode extends OpMode {
     protected DigitalChannel poleBeam;
 
     private static final String TAG = "BaseOpMode";
-    protected static final double HEADING_P = 0.0145;
+    protected static final double HEADING_P = 0.014;
     protected static final double HEADING_I = 0.0;
     protected static final double HEADING_D = 0.011;
 
@@ -48,6 +48,8 @@ public abstract class BaseOpMode extends OpMode {
     protected MiniPID headingPID;
     protected MiniPID distancePID;
     protected DcMotor light;
+    protected Integer heading;
+    protected Integer distance;
 
     @Override
     public void init(){
@@ -69,7 +71,7 @@ public abstract class BaseOpMode extends OpMode {
         headingPID.setOutputLimits(-.5,.5);
         distancePID = new MiniPID(DISTANCE_P, DISTANCE_I, DISTANCE_D);
         distancePID.setSetpoint(0);
-        distancePID.setOutputLimits(-1,1);
+        distancePID.setOutputLimits(-0.4,0.4);
     }
 
     private void setDriveSystem() {
@@ -90,9 +92,12 @@ public abstract class BaseOpMode extends OpMode {
         Integer headingOffset = pixycam.headingOffset(colorSignature);
         Log.d(TAG, "heading offset: " + headingOffset);
         if (headingOffset == null) return false;
-        double headingPIDOutput = headingPID.getOutput(headingOffset);
+        else{
+            heading = headingOffset;
+        }
+        double headingPIDOutput = headingPID.getOutput(heading);
         Log.d(TAG, "heading PID output: " + headingPIDOutput);
-        if (headingOffset > 3 || headingOffset < -3) {
+        if (heading > 3 || heading < -3) {
             //rightX = (float)(Math.abs(headingPIDOutput) < 0.2 ? (-0.2 * Math.signum(headingPIDOutput)) : -headingPIDOutput);
             rightX = (float)-headingPIDOutput;
         } else {
@@ -110,9 +115,12 @@ public abstract class BaseOpMode extends OpMode {
         Integer distanceOffset = pixycam.distanceOffset(colorSignature, desiredWidth);// find actual desired width
         Log.d(TAG, "distance offset: " + distanceOffset);
         if(distanceOffset == null) return false;
-        double distancePIDOutput = distancePID.getOutput(distanceOffset);
+        else{
+            distance = distanceOffset;
+        }
+        double distancePIDOutput = distancePID.getOutput(distance);
         Log.d(TAG, "distance PID output: " + distancePIDOutput);
-        if (distanceOffset > 1 || distanceOffset < -1) {
+        if (distance > 1 || distance < -1) {
             //leftY = (float)(Math.abs(distancePIDOutput) < 0.1 ? (0.1 * Math.signum(distancePIDOutput)) : distancePIDOutput);
             leftY = (float)distancePIDOutput;
         } else {

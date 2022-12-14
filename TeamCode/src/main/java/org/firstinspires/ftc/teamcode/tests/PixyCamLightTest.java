@@ -18,6 +18,7 @@ public class PixyCamLightTest extends OpMode {
 
     int targetColor;
     Pixy2 pixycam;
+    Integer distance;
 
     /** Initialization */
     public void init(){
@@ -46,7 +47,9 @@ public class PixyCamLightTest extends OpMode {
             setColor(Pixy2.YELLOW);
         }
 
-        telemetryData();
+        if(targetColor != 0){
+            telemetryData();
+        }
 
     }
 
@@ -79,10 +82,13 @@ public class PixyCamLightTest extends OpMode {
     private void telemetryData() {
         String color = getColor();
         telemetry.addData("Target Color: ", getColor());
-        int distanceOffset = pixycam.distanceOffset(targetColor, targetColor == Pixy2.YELLOW ? POLE_WIDTH : CONE_WIDTH);
-        int headingOffset = pixycam.headingOffset(targetColor);
-        telemetry.addData(color + " Distance Offset", distanceOffset);
-        telemetry.addData(color + " Rotation Offset", headingOffset);
+        Integer distanceOffset = pixycam.distanceOffset(targetColor, targetColor == Pixy2.YELLOW ? POLE_WIDTH : CONE_WIDTH);
+        if(distanceOffset != null){
+            distance = distanceOffset;
+        }
+        //Integer headingOffset = pixycam.headingOffset(targetColor);
+        telemetry.addData(color + " Distance Offset", distance);
+        //telemetry.addData(color + " Rotation Offset", headingOffset);
         telemetry.update();
     }
 
