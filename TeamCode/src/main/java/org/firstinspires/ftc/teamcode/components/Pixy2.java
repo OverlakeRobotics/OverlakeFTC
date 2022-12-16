@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.components;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchDevice;
@@ -89,8 +91,14 @@ public class Pixy2 extends I2cDeviceSynchDevice<I2cDeviceSynch> {
         if (elapsedTime.milliseconds() > lastPoll + 50) {
             lastPoll = elapsedTime.milliseconds();
             byte[] request = Type.GET_BLOCKS.request(signum,1);
+            for (int i = 0; i < request.length; i++) {
+                Log.d(TAG, "Request " + i + ": " + request[i]);
+            }
             this.deviceClient.write(request,I2cWaitControl.NONE);
             byte[] response = this.deviceClient.read(0, 20);
+            for (int i = 0; i < response.length; i++) {
+                Log.d(TAG, "Response " + i + ": " + response[i]);
+            }
             int responseSignature = getSignature(response);
             if (responseSignature == signature) {
                 return new Block(signature, response);// TODO fix.
